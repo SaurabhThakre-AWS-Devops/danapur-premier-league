@@ -12,22 +12,21 @@ const links = [
 export function SiteHeader() {
   const pathname = usePathname();
   return (
-    <header className="sticky top-0 z-40 border-b border-[#c4a15a]/40 bg-[#07110c]/90 backdrop-blur-md">
-      <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4">
+    <header className="sticky top-0 z-40 border-b border-[#c4a15a]/35 bg-[#06110c]/85 backdrop-blur-md">
+      <div className="mx-auto flex h-[4.25rem] w-full max-w-6xl items-center justify-between gap-3 px-4">
         <Link href="/" className="flex min-w-0 items-center gap-3">
-          <span className="grid size-10 shrink-0 place-items-center bg-[#1e4d34] font-display text-lg tracking-wide text-[#f6f1e4]">
+          <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-[#1e4d34] font-display text-lg tracking-wide text-[#f6f1e4] ring-1 ring-[#c4a15a]/50">
             DPL
           </span>
           <span className="min-w-0">
-            <span className="block truncate font-display text-lg leading-none tracking-wide text-[#f6f1e4] sm:text-xl">
-              Danapur Premier League
+            <span className="block truncate font-display text-xl leading-none tracking-wide text-[#f6f1e4] sm:text-2xl">
+              <span className="sm:hidden">DPL 2026</span>
+              <span className="hidden sm:inline">Danapur Premier League</span>
             </span>
-            <span className="mt-1 block font-display text-[11px] tracking-[0.22em] text-[#c4a15a]">
-              CRICKET 2026
-            </span>
+            <span className="mt-1 block font-display text-[11px] tracking-[0.22em] text-[#c4a15a]">CRICKET 2026</span>
           </span>
         </Link>
-        <nav className="flex items-center gap-1 sm:gap-2">
+        <nav className="flex items-center gap-1 rounded-full bg-white/5 p-1 ring-1 ring-white/10">
           {links.map((link) => {
             const active = pathname === link.href;
             return (

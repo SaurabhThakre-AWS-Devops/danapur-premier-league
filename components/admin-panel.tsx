@@ -247,7 +247,7 @@ export function AdminPanel() {
   if (phase === "login") {
     return (
       <div className="mx-auto w-full max-w-md px-4 py-12">
-        <form onSubmit={login} className="scorecard grid gap-4 rounded-3xl p-6">
+        <form onSubmit={login} className="scorecard grid gap-4 rounded-3xl p-6 sm:p-8">
           <p className="font-display text-xs tracking-[0.22em] text-[#8a6a2f]">ORGANISER</p>
           <h1 className="font-display text-4xl tracking-wide text-[#17241c]">Full access</h1>
           <p className="text-sm leading-6 text-[#3e5146]">

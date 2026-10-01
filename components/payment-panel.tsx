@@ -21,22 +21,27 @@ export function PaymentPanel({ open }: { open: boolean }) {
 
   return (
     <aside className="scorecard rounded-3xl p-4 sm:p-5">
-      <p className="font-display text-xs tracking-[0.22em] text-[#8a6a2f]">02 · ENTRY FEE</p>
-      <h2 className="mt-1 font-display text-3xl tracking-wide text-[#17241c]">Pay ₹{FEE_RUPEES} from your phone</h2>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="font-display text-xs tracking-[0.22em] text-[#8a6a2f]">STEP 1 · ENTRY FEE</p>
+          <h2 className="mt-1 font-display text-3xl tracking-wide text-[#17241c]">Pay ₹{FEE_RUPEES}</h2>
+        </div>
+        <span className="rounded-full bg-[#1e4d34] px-3 py-1 font-display text-sm tracking-wide text-[#f6f1e4]">PHONEPE</span>
+      </div>
       <p className="mt-2 text-sm leading-6 text-[#3e5146]">
-        Send only ₹{FEE_RUPEES} to {PAYEE_NAME}. After you pay, the transaction ID is required on the form.
+        Send only ₹{FEE_RUPEES} to {PAYEE_NAME}. Then put the transaction ID in the form.
       </p>
 
       {open ? (
         <>
-          <div className="mt-4 overflow-hidden rounded-2xl bg-black">
+          <div className="relative mt-4 h-72 overflow-hidden rounded-2xl bg-black sm:h-80">
             <Image
               src="/phonepe-qr.jpg"
               alt="PhonePe QR for Ratan Kailas Gawai, Danapur Premier League entry fee ₹100"
-              width={836}
-              height={1600}
+              fill
               priority
-              className="mx-auto h-auto max-h-[440px] w-auto"
+              sizes="(min-width: 1024px) 420px, 100vw"
+              className="object-cover object-[center_38%]"
             />
           </div>
           <a

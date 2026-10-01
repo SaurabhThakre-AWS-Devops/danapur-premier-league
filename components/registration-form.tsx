@@ -155,7 +155,7 @@ export function RegistrationForm() {
 
   return (
     <section className="scorecard rounded-3xl p-5 sm:p-7">
-      <p className="font-display text-xs tracking-[0.22em] text-[#8a6a2f]">01 · PLAYER FORM</p>
+      <p className="font-display text-xs tracking-[0.22em] text-[#8a6a2f]">STEP 2 · PLAYER FORM</p>
       <h2 className="mt-1 font-display text-3xl tracking-wide text-[#17241c]">Registration</h2>
       <p className="mt-2 text-sm text-[#3e5146]">
         Mobile and age are required. One player per mobile number. Entry ₹{FEE_RUPEES}.
@@ -197,6 +197,7 @@ export function RegistrationForm() {
             />
           </Field>
         </div>
+        <SectionTitle>How you play</SectionTitle>
         <Field id="area" label="Area" hint="Danapur, Khagaul, Digha..." error={errors.area}>
           <Input id="area" list="dpl-areas" value={area} onChange={(event) => setArea(event.target.value)} className={inputClass} aria-invalid={Boolean(errors.area)} required />
           <datalist id="dpl-areas">
@@ -248,6 +249,7 @@ export function RegistrationForm() {
             </Select>
           </Field>
         </div>
+        <SectionTitle>Payment proof</SectionTitle>
         <Field id="utr" label="UPI transaction ID" hint="From PhonePe history after you pay ₹100" error={errors.utr}>
           <Input
             id="utr"
@@ -260,7 +262,7 @@ export function RegistrationForm() {
             required
           />
         </Field>
-        <div className="flex items-start gap-3 rounded-xl bg-[#fffdf8] px-3 py-3">
+        <div className="flex items-start gap-3 rounded-xl border border-[#c4a15a]/50 bg-[#fffdf8] px-3 py-3">
           <Checkbox
             checked={paid}
             onCheckedChange={(checked) => setPaid(checked)}
@@ -282,6 +284,14 @@ export function RegistrationForm() {
         </Button>
       </form>
     </section>
+  );
+}
+
+function SectionTitle({ children }: { children: ReactNode }) {
+  return (
+    <p className="mt-1 border-t border-[#1e4d34]/10 pt-4 font-display text-sm tracking-[0.18em] text-[#8a6a2f] uppercase">
+      {children}
+    </p>
   );
 }
 
