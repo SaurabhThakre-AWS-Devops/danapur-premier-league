@@ -2,7 +2,7 @@
 
 Cricket player registration for Danapur Premier League.
 
-Players fill the form, pay the ₹100 entry fee on the PhonePe QR of Ratan Kailas Gawai, and their name shows on a public list so everyone can see who has registered. Each new registration emails the full list to `gawairatan960@gmail.com`. The organiser page can download the same list as Excel.
+Players fill the form, pay the ₹100 entry fee on the PhonePe QR of Ratan Kailas Gawai, and their name shows on a public list so everyone can see who has registered. Each new registration emails the full list to `sthakre252001@gmail.com`. The organiser page can download the same list as Excel.
 
 Last date: **19 October 2026, 11:59 PM IST**.
 
@@ -19,7 +19,7 @@ Open `/` to register, `/players` for the public list, and `/admin` for the organ
 
 The public site is <https://saurabhthakre-aws-devops.github.io/danapur-premier-league/>.
 
-On that page, the shared list of names is stored at KVdb for the organiser email `gawairatan960@gmail.com`. The full mobile number and UPI transaction ID are not in that list. They are sent by email to the same address. The first save needs the organiser to open the confirmation mail from KVdb, and the first email needs the confirmation mail from FormSubmit. A name stays on the public list for 7 days after the last registration, then that free store drops it. The organiser inbox is the copy that remains.
+On that page, the shared list of names is stored at KVdb for the organiser email `sthakre252001@gmail.com`. The full mobile number and UPI transaction ID are not in that list. They are sent by email to the same address. The first save needs the organiser to open the confirmation mail from KVdb, and the first email needs the confirmation mail from FormSubmit. A name stays on the public list for 7 days after the last registration, then that free store drops it. The organiser inbox is the copy that remains.
 
 ## Mail
 

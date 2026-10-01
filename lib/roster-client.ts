@@ -1,7 +1,7 @@
 import { OWNER_EMAIL } from "@/lib/constants";
 import type { PublicPlayer } from "@/lib/types";
 
-const ROSTER_URL = "https://kvdb.io/P7MNCMg5z1rrkKaFnY6Gh1/roster";
+const ROSTER_URL = "https://kvdb.io/Q93hgPQ1KBKYesh8cTHT79/roster";
 
 export type RosterPlayer = PublicPlayer & {
   mobileHash: string;

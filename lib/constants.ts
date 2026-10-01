@@ -1,7 +1,7 @@
 export const LEAGUE = "Danapur Premier League";
 export const SEASON = "2026";
 export const FEE_RUPEES = 100;
-export const OWNER_EMAIL = "gawairatan960@gmail.com";
+export const OWNER_EMAIL = "sthakre252001@gmail.com";
 export const PAYEE_NAME = "Ratan Kailas Gawai";
 export const UPI_ID = "9370797557@ybl";
 export const DEADLINE_ISO = "2026-10-19T23:59:59+05:30";

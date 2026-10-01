@@ -12,6 +12,7 @@ import {
   BOWLING,
   FEE_RUPEES,
   JERSEYS,
+  OWNER_EMAIL,
   ROLES,
 } from "@/lib/constants";
 import { maskTail } from "@/lib/format";
@@ -123,7 +124,7 @@ export function RegistrationForm() {
         const message = error instanceof Error ? error.message : "Registration could not be saved.";
         setFormError(
           message.toLowerCase().includes("not verified")
-            ? "The list store is waiting for a confirmation email to gawairatan960@gmail.com. Open that mail, confirm it, then register again."
+            ? `The list store is waiting for a confirmation email to ${OWNER_EMAIL}. Open that mail, confirm it, then register again.`
             : message,
         );
       } finally {
@@ -173,7 +174,7 @@ export function RegistrationForm() {
           {done.emailSent
             ? "The organiser email has the full mobile number and transaction ID."
             : process.env.NEXT_PUBLIC_STATIC_HOST === "true"
-              ? "The organiser email is waiting for one confirmation link at gawairatan960@gmail.com. After that link is opened, the full mobile number and transaction ID will arrive by email."
+              ? `The organiser email is waiting for one confirmation link at ${OWNER_EMAIL}. After that link is opened, the full mobile number and transaction ID will arrive by email.`
               : "The full list is ready as Excel on the organiser's admin page."}
         </p>
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
