@@ -50,7 +50,7 @@ export function RegistrationForm() {
   const [errors, setErrors] = useState<Errors>({});
   const [formError, setFormError] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [done, setDone] = useState<{ player: PublicPlayer; emailSent: boolean } | null>(null);
+  const [done, setDone] = useState<{ player: PublicPlayer; emailSent: boolean; listSaved?: boolean } | null>(null);
 
   function onMobile(value: string) {
     const digits = value.replace(/\D/g, "");
@@ -86,20 +86,21 @@ export function RegistrationForm() {
     setSubmitting(true);
     if (process.env.NEXT_PUBLIC_STATIC_HOST === "true") {
       try {
-        const roster = await loadRoster();
         const mobileHash = await digest(parsed.data.mobile);
         const utrHash = await digest(parsed.data.utr);
-        if (roster.players.some((player) => player.mobileHash === mobileHash)) {
+        const roster = await loadRoster().catch(() => null);
+        if (roster?.players.some((player) => player.mobileHash === mobileHash)) {
           setErrors({ mobile: "This mobile number is already registered." });
           return;
         }
-        if (roster.players.some((player) => player.utrHash === utrHash)) {
+        if (roster?.players.some((player) => player.utrHash === utrHash)) {
           setErrors({ utr: "This transaction ID is already used by another player." });
           return;
         }
         const createdAt = new Date().toISOString();
+        const nextNumber = roster?.nextNumber ?? 1;
         const stored = {
-          id: `DPL-${String(roster.nextNumber).padStart(3, "0")}`,
+          id: `DPL-${String(nextNumber).padStart(3, "0")}`,
           name: parsed.data.name,
           age: parsed.data.age,
           area: parsed.data.area,
@@ -113,20 +114,26 @@ export function RegistrationForm() {
           mobileHash,
           utrHash,
         };
-        const next = { nextNumber: roster.nextNumber + 1, players: [...roster.players, stored] };
-        await saveRoster(next);
+        const next = {
+          nextNumber: nextNumber + 1,
+          players: [...(roster?.players ?? []), stored],
+        };
         const mail = await emailRegistration(
           { ...stored, mobile: parsed.data.mobile, utr: parsed.data.utr },
           next,
         ).catch(() => ({ ok: false, message: "" }));
-        setDone({ player: toPublic(stored), emailSent: mail.ok });
+        let listSaved = roster !== null;
+        if (roster) {
+          try {
+            await saveRoster(next);
+          } catch {
+            listSaved = false;
+          }
+        }
+        setDone({ player: toPublic(stored), emailSent: mail.ok, listSaved });
       } catch (error) {
         const message = error instanceof Error ? error.message : "Registration could not be saved.";
-        setFormError(
-          message.toLowerCase().includes("not verified")
-            ? `The list store is waiting for a confirmation email to ${OWNER_EMAIL}. Open that mail, confirm it, then register again.`
-            : message,
-        );
+        setFormError(message);
       } finally {
         setSubmitting(false);
       }
@@ -170,12 +177,25 @@ export function RegistrationForm() {
         </p>
         <p className="mt-1 text-sm text-[#3e5146]">UTR {maskTail(utr)}</p>
         <p className="mt-4 text-sm leading-6">
-          Your name is on the public list so everyone can see it.{" "}
-          {done.emailSent
-            ? "The organiser email has the full mobile number and transaction ID."
-            : process.env.NEXT_PUBLIC_STATIC_HOST === "true"
-              ? `The organiser email is waiting for one confirmation link at ${OWNER_EMAIL}. After that link is opened, the full mobile number and transaction ID will arrive by email.`
-              : "The full list is ready as Excel on the organiser's admin page."}
+          {process.env.NEXT_PUBLIC_STATIC_HOST === "true" ? (
+            done.listSaved === false ? (
+              <>This player's details were emailed, but the public list did not update. Try again if the name is missing.</>
+            ) : (
+              <>Your name is on the public list so everyone can see it.</>
+            )
+          ) : (
+            <>Your name is on the public list so everyone can see it.</>
+          )}{" "}
+          {process.env.NEXT_PUBLIC_STATIC_HOST === "true" ? (
+            <>
+              Open {OWNER_EMAIL}, including Spam. The first message from FormSubmit is titled “Action Required: Activate FormSubmit”.
+              Click Activate Form once. After that click, this player's full mobile number and transaction ID arrive in the same inbox, and so does every later registration.
+            </>
+          ) : done.emailSent ? (
+            "The organiser email has the full mobile number and transaction ID."
+          ) : (
+            "The full list is ready as Excel on the organiser's admin page."
+          )}
         </p>
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
           <Link href="/players" className="inline-flex h-12 items-center justify-center rounded-lg bg-[#1e4d34] px-4 font-semibold text-[#f6f1e4]">

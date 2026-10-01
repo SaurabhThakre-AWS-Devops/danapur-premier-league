@@ -19,7 +19,7 @@ Open `/` to register, `/players` for the public list, and `/admin` for the organ
 
 The public site is <https://saurabhthakre-aws-devops.github.io/danapur-premier-league/>.
 
-On that page, the shared list of names is stored at KVdb for the organiser email `sthakre252001@gmail.com`. The full mobile number and UPI transaction ID are not in that list. They are sent by email to the same address. The first save needs the organiser to open the confirmation mail from KVdb, and the first email needs the confirmation mail from FormSubmit. A name stays on the public list for 7 days after the last registration, then that free store drops it. The organiser inbox is the copy that remains.
+On that page, the shared list of names is a public page. It does not contain the full mobile number or the UPI transaction ID. Those are emailed to `sthakre252001@gmail.com` through FormSubmit. The first time, that inbox gets one mail titled “Action Required: Activate FormSubmit”. Open it, including Spam, and click Activate Form once. After that, every registration is emailed there with the full mobile number and transaction ID.
 
 ## Mail
 
