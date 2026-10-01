@@ -13,31 +13,31 @@ const steps = [
 
 export function HomeExperience({ open }: { open: boolean }) {
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:py-12">
+    <div className="mx-auto w-full max-w-6xl px-3 py-5 sm:px-4 sm:py-12">
       <section>
-        <p className="font-display text-sm tracking-[0.28em] text-[#c4a15a]">DANAPUR · SEASON 2026</p>
-        <h1 className="mt-3 max-w-4xl font-display text-5xl leading-[0.92] tracking-wide text-[#f6f1e4] sm:text-7xl">
+        <p className="font-display text-xs tracking-[0.22em] text-[#c4a15a] sm:text-sm sm:tracking-[0.28em]">DANAPUR · SEASON 2026</p>
+        <h1 className="mt-2 max-w-4xl font-display text-4xl leading-[0.95] tracking-wide text-[#f6f1e4] sm:mt-3 sm:text-7xl">
           Danapur Premier League
         </h1>
-        <p className="mt-4 max-w-2xl text-base leading-7 text-[#f6f1e4]/85 sm:text-lg">
+        <p className="mt-3 max-w-2xl text-base leading-6 text-[#f6f1e4]/85 sm:mt-4 sm:text-lg sm:leading-7">
           Player registration for the cricket league. Entry fee ₹{FEE_RUPEES}. Last date {DEADLINE_LABEL}, 11:59 PM.
         </p>
-        <dl className="pitch-strip mt-6 grid overflow-hidden rounded-2xl sm:grid-cols-3">
+        <dl className="pitch-strip mt-4 grid grid-cols-3 overflow-hidden rounded-2xl sm:mt-6">
           <Fact label="Entry" value={`₹${FEE_RUPEES}`} />
           <Fact label="Last date" value={DEADLINE_LABEL} />
           <Fact label={open ? "Time left" : "Status"} value={open ? <Countdown /> : "Closed"} />
         </dl>
       </section>
 
-      <ol className="mt-5 grid gap-3 sm:grid-cols-3">
+      <ol className="mt-4 grid grid-cols-3 gap-2 sm:mt-5 sm:gap-3">
         {steps.map((step) => (
-          <li key={step.n} className="flex gap-3 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3">
-            <span className="grid size-8 shrink-0 place-items-center rounded-full bg-[#c4a15a] font-display text-lg text-[#17241c]">
+          <li key={step.n} className="rounded-2xl border border-white/10 bg-white/[0.04] px-2.5 py-3 sm:flex sm:gap-3 sm:px-4">
+            <span className="grid size-7 shrink-0 place-items-center rounded-full bg-[#c4a15a] font-display text-base text-[#17241c] sm:size-8 sm:text-lg">
               {step.n}
             </span>
-            <span>
-              <span className="block font-semibold text-[#f6f1e4]">{step.title}</span>
-              <span className="mt-0.5 block text-sm leading-5 text-[#f6f1e4]/70">{step.text}</span>
+            <span className="mt-2 block sm:mt-0">
+              <span className="block text-sm font-semibold leading-4 text-[#f6f1e4] sm:text-base">{step.title}</span>
+              <span className="mt-0.5 hidden text-sm leading-5 text-[#f6f1e4]/70 sm:block">{step.text}</span>
             </span>
           </li>
         ))}
@@ -72,9 +72,9 @@ export function HomeExperience({ open }: { open: boolean }) {
 
 function Fact({ label, value }: { label: string; value: ReactNode }) {
   return (
-    <div className="border-b border-[#c4a15a]/25 px-4 py-4 last:border-b-0 sm:border-r sm:border-b-0 sm:last:border-r-0">
-      <dt className="font-display text-[11px] tracking-[0.18em] text-[#c4a15a]">{label.toUpperCase()}</dt>
-      <dd className="mt-1 text-lg font-semibold text-[#f6f1e4]">{value}</dd>
+    <div className="border-r border-[#c4a15a]/25 px-2 py-3 last:border-r-0 sm:px-4 sm:py-4">
+      <dt className="font-display text-[10px] tracking-[0.12em] text-[#c4a15a] sm:text-[11px] sm:tracking-[0.18em]">{label.toUpperCase()}</dt>
+      <dd className="mt-1 text-sm font-semibold leading-5 text-[#f6f1e4] sm:text-lg">{value}</dd>
     </div>
   );
 }

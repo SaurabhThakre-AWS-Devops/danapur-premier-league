@@ -14,8 +14,30 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BATTING, BOWLING, FEE_RUPEES, JERSEYS, OWNER_EMAIL, ROLES } from "@/lib/constants";
 import { formatMobile, formatWhen } from "@/lib/format";
+import { digest, loadRoster, saveRoster, type RosterPlayer } from "@/lib/roster-client";
 import { normalizeMobile, normalizeUtr } from "@/lib/schema";
 import type { EmailLogEntry, PaymentStatus, Player } from "@/lib/types";
+
+const staticHost = process.env.NEXT_PUBLIC_STATIC_HOST === "true";
+const ORGANISER_PASSWORD_HASH = "afc4c7938e797715249a4082b35ccfffb601c8e75445cb3463451121d361dc1a";
+const ORGANISER_SESSION = "dpl_organiser";
+
+function fromRoster(player: RosterPlayer): Player {
+  return {
+    id: player.id,
+    name: player.name,
+    mobile: `••••${player.mobileTail}`,
+    age: player.age,
+    area: player.area,
+    role: player.role,
+    batting: player.batting,
+    bowling: player.bowling,
+    jersey: player.jersey,
+    utr: "In your email",
+    paymentStatus: player.paymentStatus,
+    createdAt: player.createdAt,
+  };
+}
 
 const inputClass = "h-12 border-[#17241c]/15 bg-[#fffdf8] text-[#17241c]";
 
@@ -49,6 +71,14 @@ export function AdminPanel() {
   const [appPassword, setAppPassword] = useState("");
 
   async function load() {
+    if (staticHost) {
+      const roster = await loadRoster();
+      setPlayers(roster.players.map(fromRoster));
+      setLog([]);
+      setGmailReady(false);
+      setPhase("ready");
+      return;
+    }
     const response = await fetch("/api/admin/players", { cache: "no-store" });
     if (response.status === 401) {
       setPhase("login");
@@ -66,9 +96,12 @@ export function AdminPanel() {
   }
 
   useEffect(() => {
-    if (process.env.NEXT_PUBLIC_STATIC_HOST === "true") {
+    if (staticHost) {
+      if (window.sessionStorage.getItem(ORGANISER_SESSION) === "1") {
+        void load();
+        return;
+      }
       setPhase("login");
-      setLoginError("Organiser login runs on the registration server. This GitHub page cannot open the full list.");
       return;
     }
     void (async () => {
@@ -98,6 +131,18 @@ export function AdminPanel() {
     setLoginError("");
     setBusy(true);
     try {
+      if (staticHost) {
+        const hash = await digest(password);
+        const emailOk = email.trim().toLowerCase() === OWNER_EMAIL;
+        if (!emailOk || hash !== ORGANISER_PASSWORD_HASH) {
+          setLoginError("Email or password is wrong.");
+          return;
+        }
+        window.sessionStorage.setItem(ORGANISER_SESSION, "1");
+        setPassword("");
+        await load();
+        return;
+      }
       const response = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -116,9 +161,26 @@ export function AdminPanel() {
   }
 
   async function logout() {
-    await fetch("/api/admin/logout", { method: "POST" });
+    if (staticHost) window.sessionStorage.removeItem(ORGANISER_SESSION);
+    else await fetch("/api/admin/logout", { method: "POST" });
     setPhase("login");
     setPlayers([]);
+  }
+
+  function downloadCsv() {
+    const header = ["No", "Name", "Age", "Area", "Role", "Batting", "Bowling", "Jersey", "Mobile last 4", "Payment", "Registered"];
+    const lines = players.map((player) =>
+      [player.id, player.name, player.age, player.area, player.role, player.batting, player.bowling, player.jersey, player.mobile, player.paymentStatus, player.createdAt]
+        .map((value) => `"${String(value).replaceAll('"', '""')}"`)
+        .join(","),
+    );
+    const blob = new Blob([[header.join(","), ...lines].join("\n")], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = "DPL-2026-registrations.csv";
+    anchor.click();
+    URL.revokeObjectURL(url);
   }
 
   async function downloadExcel() {
@@ -181,6 +243,15 @@ export function AdminPanel() {
   }
 
   async function setPayment(player: Player, paymentStatus: PaymentStatus) {
+    if (staticHost) {
+      const roster = await loadRoster();
+      await saveRoster({
+        ...roster,
+        players: roster.players.map((item) => (item.id === player.id ? { ...item, paymentStatus } : item)),
+      });
+      await load();
+      return;
+    }
     const response = await fetch(`/api/admin/players/${player.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -216,6 +287,35 @@ export function AdminPanel() {
     setBusy(true);
     setNotice("");
     try {
+      if (staticHost) {
+        const roster = await loadRoster();
+        const age = Number(draft.age);
+        if (!Number.isInteger(age) || age < 12 || age > 60) {
+          setNotice("Age must be from 12 to 60.");
+          return;
+        }
+        await saveRoster({
+          ...roster,
+          players: roster.players.map((item) =>
+            item.id === editing.id
+              ? {
+                  ...item,
+                  name: draft.name.trim(),
+                  age,
+                  area: draft.area.trim(),
+                  role: draft.role as Player["role"],
+                  batting: draft.batting as Player["batting"],
+                  bowling: draft.bowling,
+                  jersey: draft.jersey,
+                }
+              : item,
+          ),
+        });
+        setEditing(null);
+        setDraft(null);
+        await load();
+        return;
+      }
       const response = await fetch(`/api/admin/players/${editing.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -237,6 +337,14 @@ export function AdminPanel() {
   async function confirmDelete() {
     if (!removing) return;
     setBusy(true);
+    if (staticHost) {
+      const roster = await loadRoster();
+      await saveRoster({ ...roster, players: roster.players.filter((item) => item.id !== removing.id) });
+      setRemoving(null);
+      await load();
+      setBusy(false);
+      return;
+    }
     const response = await fetch(`/api/admin/players/${removing.id}`, { method: "DELETE" });
     const data = (await response.json()) as { error?: string };
     if (!response.ok) setNotice(data.error || "Delete failed.");
@@ -256,7 +364,7 @@ export function AdminPanel() {
           <p className="font-display text-xs tracking-[0.22em] text-[#8a6a2f]">ORGANISER</p>
           <h1 className="font-display text-4xl tracking-wide text-[#17241c]">Full access</h1>
           <p className="text-sm leading-6 text-[#3e5146]">
-            Only {OWNER_EMAIL} owns this list. Mobile numbers, transaction IDs, and Excel are all here.
+            Sign in as {OWNER_EMAIL}. Full mobile numbers and transaction IDs also arrive in that inbox.
           </p>
           <div className="grid gap-1.5">
             <Label htmlFor="admin-email">Email</Label>
@@ -295,36 +403,46 @@ export function AdminPanel() {
       </dl>
 
       <section className="scorecard mt-6 rounded-3xl p-4 sm:p-5">
-        <h2 className="font-display text-2xl tracking-wide">Excel email</h2>
-        <p className="mt-2 text-sm leading-6 text-[#3e5146]">
-          Download the full list as Excel here. For automatic email, add a Gmail App Password below — Google Account, Security, 2-Step Verification, then App passwords. That is not the normal Gmail password. After it is saved, every new player sends the full Excel file to {OWNER_EMAIL}.
-        </p>
-        <p className="mt-2 text-sm font-semibold">{gmailReady ? "Gmail is connected for Excel attachments." : "No Gmail password is saved for Excel attachments yet."}</p>
-        <form onSubmit={saveMail} className="mt-3 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
-          <label className="grid gap-1 text-sm">
-            Gmail App Password
-            <Input
-              type="password"
-              autoComplete="new-password"
-              value={appPassword}
-              onChange={(event) => setAppPassword(event.target.value)}
-              placeholder="16 letters, spaces are fine"
-              className={inputClass}
-            />
-          </label>
-          <Button type="submit" className="h-12" disabled={busy || appPassword.trim().length < 8}>
-            Save and send test
+        <h2 className="font-display text-2xl tracking-wide">{staticHost ? "Player list" : "Excel email"}</h2>
+        {staticHost ? (
+          <p className="mt-2 text-sm leading-6 text-[#3e5146]">
+            Full mobile numbers and transaction IDs are in {OWNER_EMAIL}. Confirm a payment, correct a name, or remove a player here, then download the list.
+          </p>
+        ) : (
+          <>
+            <p className="mt-2 text-sm leading-6 text-[#3e5146]">
+              Download the full list as Excel here. For automatic email, add a Gmail App Password below — Google Account, Security, 2-Step Verification, then App passwords. That is not the normal Gmail password. After it is saved, every new player sends the full Excel file to {OWNER_EMAIL}.
+            </p>
+            <p className="mt-2 text-sm font-semibold">{gmailReady ? "Gmail is connected for Excel attachments." : "No Gmail password is saved for Excel attachments yet."}</p>
+            <form onSubmit={saveMail} className="mt-3 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
+              <label className="grid gap-1 text-sm">
+                Gmail App Password
+                <Input
+                  type="password"
+                  autoComplete="new-password"
+                  value={appPassword}
+                  onChange={(event) => setAppPassword(event.target.value)}
+                  placeholder="16 letters, spaces are fine"
+                  className={inputClass}
+                />
+              </label>
+              <Button type="submit" className="h-12" disabled={busy || appPassword.trim().length < 8}>
+                Save and send test
+              </Button>
+            </form>
+          </>
+        )}
+        <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+          <Button type="button" variant="outline" className="h-11 sm:h-10" onClick={() => void (staticHost ? downloadCsv() : downloadExcel())}>
+            {staticHost ? "Download list" : "Download Excel"}
           </Button>
-        </form>
-        <div className="mt-3 flex flex-wrap gap-2">
-          <Button type="button" variant="outline" className="h-10" onClick={() => void downloadExcel()}>
-            Download Excel
-          </Button>
-          <Button type="button" variant="outline" className="h-10" disabled={busy} onClick={() => void resend()}>
-            Email the full list now
-          </Button>
-          {gmailReady ? (
-            <Button type="button" variant="ghost" className="h-10" disabled={busy} onClick={() => void clearMail()}>
+          {staticHost ? null : (
+            <Button type="button" variant="outline" className="h-11 sm:h-10" disabled={busy} onClick={() => void resend()}>
+              Email the full list now
+            </Button>
+          )}
+          {!staticHost && gmailReady ? (
+            <Button type="button" variant="ghost" className="h-11 sm:h-10" disabled={busy} onClick={() => void clearMail()}>
               Remove Gmail password
             </Button>
           ) : null}
@@ -371,18 +489,18 @@ export function AdminPanel() {
                   {formatWhen(player.createdAt)} · {player.paymentStatus === "verified" ? "Payment confirmed" : "Fee still to check"}
                 </p>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="grid w-full grid-cols-3 gap-2 sm:flex sm:w-auto sm:flex-wrap">
                 <Button
                   type="button"
-                  className="h-10"
+                  className="h-11 px-2 text-xs sm:h-10 sm:px-4 sm:text-sm"
                   onClick={() => void setPayment(player, player.paymentStatus === "verified" ? "pending" : "verified")}
                 >
-                  {player.paymentStatus === "verified" ? "Mark pending" : "Confirm ₹100"}
+                  {player.paymentStatus === "verified" ? "Pending" : "Confirm ₹100"}
                 </Button>
-                <Button type="button" variant="outline" className="h-10" onClick={() => openEdit(player)}>
+                <Button type="button" variant="outline" className="h-11 px-2 text-xs sm:h-10 sm:px-4 sm:text-sm" onClick={() => openEdit(player)}>
                   Edit
                 </Button>
-                <Button type="button" variant="destructive" className="h-10" onClick={() => setRemoving(player)}>
+                <Button type="button" variant="destructive" className="h-11 px-2 text-xs sm:h-10 sm:px-4 sm:text-sm" onClick={() => setRemoving(player)}>
                   Delete
                 </Button>
               </div>
@@ -405,10 +523,12 @@ export function AdminPanel() {
                 <Input value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} className={inputClass} required />
               </Label>
               <div className="grid gap-3 sm:grid-cols-2">
+                {staticHost ? null : (
                 <Label className="grid gap-1">
                   Mobile
                   <Input value={draft.mobile} onChange={(event) => setDraft({ ...draft, mobile: normalizeMobile(event.target.value).slice(0, 10) })} className={inputClass} required />
                 </Label>
+                )}
                 <Label className="grid gap-1">
                   Age
                   <Input value={draft.age} onChange={(event) => setDraft({ ...draft, age: event.target.value.replace(/\D/g, "").slice(0, 2) })} className={inputClass} required />
@@ -462,10 +582,12 @@ export function AdminPanel() {
                   </select>
                 </Label>
               </div>
+              {staticHost ? null : (
               <Label className="grid gap-1">
                 UTR
                 <Input value={draft.utr} onChange={(event) => setDraft({ ...draft, utr: normalizeUtr(event.target.value) })} className={inputClass} required />
               </Label>
+              )}
             </form>
           ) : null}
           <DialogFooter>

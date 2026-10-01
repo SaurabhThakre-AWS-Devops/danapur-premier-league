@@ -15,7 +15,7 @@ export function SiteFooter() {
             </a>
           </p>
         </div>
-        <Link href="/admin" className="text-[#c4a15a] underline-offset-4 hover:underline">
+        <Link href="/admin" className="inline-flex h-11 items-center text-[#c4a15a] underline-offset-4 hover:underline">
           Organiser login
         </Link>
       </div>

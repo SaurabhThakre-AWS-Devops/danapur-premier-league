@@ -32,22 +32,24 @@ export function PaymentPanel({ open }: { open: boolean }) {
       </p>
 
       {open ? (
-        <>
-          <div className="mt-4 overflow-hidden rounded-2xl bg-black">
-            <img
-              src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/phonepe-qr.jpg`}
-              alt="PhonePe QR for Ratan Kailas Gawai, Danapur Premier League entry fee ₹100"
-              className="mx-auto max-h-[34rem] w-full object-contain"
-            />
-          </div>
+        <div className="mt-4 flex flex-col">
           <a
             href={upiPayLink()}
-            className={cn(buttonVariants({ size: "lg" }), "mt-4 h-12 w-full text-base")}
+            className={cn(buttonVariants({ size: "lg" }), "order-1 h-12 w-full text-base sm:order-2 sm:mt-4")}
           >
             Pay ₹{FEE_RUPEES} on your phone
           </a>
-          <p className="mt-2 text-center text-xs text-[#5c6b62]">On a phone this button opens PhonePe or another UPI app. On a computer, scan the QR.</p>
-          <dl className="mt-4 grid gap-3 text-sm">
+          <p className="order-2 mt-2 text-center text-xs text-[#5c6b62] sm:order-3">
+            On a phone this button opens PhonePe or another UPI app. On a computer, scan the QR.
+          </p>
+          <div className="order-3 mt-4 overflow-hidden rounded-2xl bg-black sm:order-1 sm:mt-0">
+            <img
+              src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/phonepe-qr.jpg`}
+              alt="PhonePe QR for Ratan Kailas Gawai, Danapur Premier League entry fee ₹100"
+              className="mx-auto max-h-64 w-full object-contain sm:max-h-[34rem]"
+            />
+          </div>
+          <dl className="order-4 mt-4 grid gap-3 text-sm">
             <CopyRow label="UPI ID" value={UPI_ID} copied={copied === "upi"} onCopy={() => copy(UPI_ID, "upi")} />
             <CopyRow
               label="Amount"
@@ -62,7 +64,7 @@ export function PaymentPanel({ open }: { open: boolean }) {
               </div>
             </div>
           </dl>
-        </>
+        </div>
       ) : (
         <p className="mt-4 rounded-xl bg-[#fffdf8] px-3 py-4 text-sm">
           Registration is closed, so new payments are not being taken.
@@ -89,7 +91,7 @@ function CopyRow({
         <p className="text-xs text-[#5c6b62]">{label}</p>
         <p className="truncate font-semibold">{value}</p>
       </div>
-      <button type="button" onClick={onCopy} className="shrink-0 text-sm font-semibold text-[#1e4d34] underline decoration-[#c4a15a] underline-offset-4">
+      <button type="button" onClick={onCopy} className="inline-flex h-11 shrink-0 items-center px-2 text-sm font-semibold text-[#1e4d34] underline decoration-[#c4a15a] underline-offset-4">
         {copied ? "Copied" : "Copy"}
       </button>
     </div>
