@@ -26,7 +26,7 @@ function fromRoster(player: RosterPlayer): Player {
   return {
     id: player.id,
     name: player.name,
-    mobile: `••••${player.mobileTail}`,
+    mobile: player.mobile || player.mobileTail,
     age: player.age,
     area: player.area,
     role: player.role,
@@ -168,17 +168,36 @@ export function AdminPanel() {
   }
 
   function downloadCsv() {
-    const header = ["No", "Name", "Age", "Area", "Role", "Batting", "Bowling", "Jersey", "Mobile last 4", "Payment", "Registered"];
-    const lines = players.map((player) =>
-      [player.id, player.name, player.age, player.area, player.role, player.batting, player.bowling, player.jersey, player.mobile, player.paymentStatus, player.createdAt]
-        .map((value) => `"${String(value).replaceAll('"', '""')}"`)
-        .join(","),
-    );
-    const blob = new Blob([[header.join(","), ...lines].join("\n")], { type: "text/csv;charset=utf-8" });
+    const header = ["No", "Name", "Age", "Role", "Batting", "Bowling", "Jersey", "Mobile", "Payment", "Registered"];
+    const rows = players.map((player) => [
+      player.id,
+      player.name,
+      String(player.age),
+      player.role,
+      player.batting,
+      player.bowling,
+      player.jersey,
+      player.mobile,
+      player.paymentStatus,
+      player.createdAt,
+    ]);
+    const cell = (value: string, mobile = false) => {
+      const safe = value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+      return mobile ? `<td style="mso-number-format:'\\@';">${safe}</td>` : `<td>${safe}</td>`;
+    };
+    const table = [
+      `<table><tr>${header.map((item) => `<th>${item}</th>`).join("")}</tr>`,
+      ...rows.map(
+        (row) =>
+          `<tr>${row.map((value, index) => cell(value, header[index] === "Mobile")).join("")}</tr>`,
+      ),
+      `</table>`,
+    ].join("");
+    const blob = new Blob([table], { type: "application/vnd.ms-excel" });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = url;
-    anchor.download = "DPL-2026-registrations.csv";
+    anchor.download = "DPL-2026-registrations.xls";
     anchor.click();
     URL.revokeObjectURL(url);
   }
@@ -406,7 +425,7 @@ export function AdminPanel() {
         <h2 className="font-display text-2xl tracking-wide">{staticHost ? "Player list" : "Excel email"}</h2>
         {staticHost ? (
           <p className="mt-2 text-sm leading-6 text-[#3e5146]">
-            Full mobile numbers and transaction IDs are in {OWNER_EMAIL}. Confirm a payment, correct a name, or remove a player here, then download the list.
+            Download Excel for the full mobile number, so you can call the player any time. The transaction ID is in {OWNER_EMAIL}.
           </p>
         ) : (
           <>
@@ -434,7 +453,7 @@ export function AdminPanel() {
         )}
         <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
           <Button type="button" variant="outline" className="h-11 sm:h-10" onClick={() => void (staticHost ? downloadCsv() : downloadExcel())}>
-            {staticHost ? "Download list" : "Download Excel"}
+            Download Excel
           </Button>
           {staticHost ? null : (
             <Button type="button" variant="outline" className="h-11 sm:h-10" disabled={busy} onClick={() => void resend()}>

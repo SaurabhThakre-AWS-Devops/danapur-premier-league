@@ -105,6 +105,7 @@ export function RegistrationForm() {
           bowling: parsed.data.bowling,
           jersey: parsed.data.jersey,
           paymentStatus: "pending" as const,
+          mobile: parsed.data.mobile,
           mobileTail: parsed.data.mobile.slice(-4),
           createdAt,
           mobileHash,

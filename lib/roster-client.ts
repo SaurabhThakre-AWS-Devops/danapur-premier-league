@@ -6,6 +6,7 @@ const ROSTER_EDIT = "https://rentry.co/api/edit/dpl2026-roster";
 const ROSTER_EDIT_CODE = "xttsQCbT";
 
 export type RosterPlayer = PublicPlayer & {
+  mobile: string;
   mobileHash: string;
   utrHash: string;
 };
