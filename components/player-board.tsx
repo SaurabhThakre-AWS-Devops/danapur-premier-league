@@ -23,22 +23,35 @@ export function PlayerBoard({ limit, showFilters = true, showIntro = true }: Pro
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_STATIC_HOST === "true") {
       let cancelled = false;
+      const apply = (players: PublicPlayer[]) => {
+        if (cancelled) return;
+        setPlayers(players);
+        setError("");
+      };
       const load = async () => {
         try {
           const roster = await loadRoster();
-          if (!cancelled) {
-            setPlayers(roster.players.map(toPublic));
-            setError("");
-          }
+          apply(roster.players.map(toPublic));
         } catch {
           if (!cancelled) setError("The public list could not be loaded.");
         }
       };
+      const onSaved = (event: Event) => {
+        const roster = (event as CustomEvent<{ players?: Parameters<typeof toPublic>[0][] }>).detail;
+        if (roster?.players) apply(roster.players.map(toPublic));
+      };
+      window.addEventListener("dpl-roster", onSaved);
       void load();
-      const id = setInterval(() => void load(), 15_000);
+      const id = setInterval(() => void load(), 60_000);
+      const onVisible = () => {
+        if (document.visibilityState === "visible") void load();
+      };
+      document.addEventListener("visibilitychange", onVisible);
       return () => {
         cancelled = true;
         clearInterval(id);
+        window.removeEventListener("dpl-roster", onSaved);
+        document.removeEventListener("visibilitychange", onVisible);
       };
     }
     let cancelled = false;
@@ -121,7 +134,14 @@ export function PlayerBoard({ limit, showFilters = true, showIntro = true }: Pro
         </div>
       ) : null}
 
-      {error ? <p className="px-6 pb-4 text-sm text-[#9b2330]">{error}</p> : null}
+      {error ? (
+        <div className="px-4 pb-4 sm:px-6">
+          <p className="text-sm text-[#9b2330]">{error}</p>
+          <button type="button" className="mt-3 h-11 rounded-lg bg-[#1e4d34] px-4 text-sm font-semibold text-[#f6f1e4]" onClick={() => window.location.reload()}>
+            Try again
+          </button>
+        </div>
+      ) : null}
 
       {players === null && !error ? (
         <div className="grid gap-3 px-4 py-5 sm:px-6">

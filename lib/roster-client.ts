@@ -50,16 +50,12 @@ function decodeHtml(value: string) {
     .replace(/&amp;/g, "&");
 }
 
-export async function loadRoster(): Promise<Roster> {
-  const response = await fetch(`${ROSTER_PAGE}?t=${Date.now()}`, { cache: "no-store" });
-  if (response.status === 404) return empty();
-  if (!response.ok) throw new Error("The public list could not be loaded.");
-  const html = await response.text();
+function parseRoster(html: string): Roster | null {
   const pre = html.match(/<pre><span><\/span>([\s\S]*?)<\/pre>/);
   const text = pre ? decodeHtml(pre[1].replace(/<[^>]+>/g, "")).trim() : "";
   const start = text.indexOf("{");
   const end = text.lastIndexOf("}");
-  if (start < 0 || end < start) return empty();
+  if (start < 0 || end < start) return null;
   try {
     const data = JSON.parse(text.slice(start, end + 1)) as Partial<Roster>;
     return {
@@ -67,8 +63,24 @@ export async function loadRoster(): Promise<Roster> {
       players: Array.isArray(data.players) ? data.players : [],
     };
   } catch {
-    return empty();
+    return null;
   }
+}
+
+export async function loadRoster(): Promise<Roster> {
+  let lastStatus = 0;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      const response = await fetch(`${ROSTER_PAGE}?t=${Date.now()}`, { credentials: "omit" });
+      if (response.status === 404) return empty();
+      lastStatus = response.status;
+      if (!response.ok) throw new Error(String(response.status));
+      return parseRoster(await response.text()) ?? empty();
+    } catch {
+      await new Promise((resolve) => setTimeout(resolve, 500 * (attempt + 1)));
+    }
+  }
+  throw new Error(lastStatus ? `The public list could not be loaded (${lastStatus}).` : "The public list could not be loaded.");
 }
 
 export async function saveRoster(roster: Roster) {

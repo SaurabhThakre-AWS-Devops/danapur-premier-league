@@ -119,10 +119,12 @@ export function RegistrationForm() {
           { ...stored, mobile: parsed.data.mobile, utr: parsed.data.utr },
           next,
         ).catch(() => ({ ok: false, message: "" }));
-        let listSaved = roster !== null;
+        let listSaved = false;
         if (roster) {
           try {
             await saveRoster(next);
+            listSaved = true;
+            window.dispatchEvent(new CustomEvent("dpl-roster", { detail: next }));
           } catch {
             listSaved = false;
           }
