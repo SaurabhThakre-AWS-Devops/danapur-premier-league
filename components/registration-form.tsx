@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import {
-  AREAS,
   BATTING,
   BOWLING,
   FEE_RUPEES,
@@ -38,7 +37,6 @@ export function RegistrationForm() {
   const [name, setName] = useState("");
   const [mobile, setMobile] = useState("");
   const [age, setAge] = useState("");
-  const [area, setArea] = useState("");
   const [role, setRole] = useState("");
   const [batting, setBatting] = useState("");
   const [bowling, setBowling] = useState("Does not bowl");
@@ -63,7 +61,6 @@ export function RegistrationForm() {
       name,
       mobile,
       age,
-      area,
       role,
       batting,
       bowling,
@@ -172,7 +169,7 @@ export function RegistrationForm() {
         <p className="mt-3 font-display text-5xl tracking-wide text-[#1e4d34]">{done.player.id}</p>
         <p className="mt-2 text-2xl font-semibold">{done.player.name}</p>
         <p className="mt-1 text-[#3e5146]">
-          {done.player.age} years · {done.player.area} · {done.player.role} · Jersey {done.player.jersey}
+          {done.player.age} years · {done.player.role} · Jersey {done.player.jersey}
         </p>
         <p className="mt-1 text-sm text-[#3e5146]">UTR {maskTail(utr)}</p>
         <p className="mt-4 text-sm leading-6">
@@ -202,7 +199,6 @@ export function RegistrationForm() {
               setName("");
               setMobile("");
               setAge("");
-              setArea("");
               setRole("");
               setBatting("");
               setJersey("");
@@ -262,14 +258,6 @@ export function RegistrationForm() {
           </Field>
         </div>
         <SectionTitle>How you play</SectionTitle>
-        <Field id="area" label="Area" hint="Danapur, Khagaul, Digha..." error={errors.area}>
-          <Input id="area" list="dpl-areas" value={area} onChange={(event) => setArea(event.target.value)} className={inputClass} aria-invalid={Boolean(errors.area)} required />
-          <datalist id="dpl-areas">
-            {AREAS.map((item) => (
-              <option key={item} value={item} />
-            ))}
-          </datalist>
-        </Field>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field id="role" label="Playing role" hint="How you play" error={errors.role}>
             <Select id="role" value={role} onChange={setRole} invalid={Boolean(errors.role)}>

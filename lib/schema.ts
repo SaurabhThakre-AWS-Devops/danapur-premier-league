@@ -47,13 +47,9 @@ export const registerSchema = z.object({
     .max(60, "Age must be between 12 and 60."),
   area: z
     .string()
-    .transform(normalizeName)
-    .pipe(
-      z
-        .string()
-        .min(2, "Enter your area.")
-        .max(80, "Area is too long."),
-    ),
+    .optional()
+    .transform((value) => normalizeName(value ?? ""))
+    .pipe(z.string().max(80)),
   role: z.enum(roleValues, { errorMap: () => ({ message: "Choose a playing role." }) }),
   batting: z.enum(battingValues, { errorMap: () => ({ message: "Choose a batting hand." }) }),
   bowling: z

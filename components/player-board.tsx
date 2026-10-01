@@ -65,7 +65,7 @@ export function PlayerBoard({ limit, showFilters = true, showIntro = true }: Pro
   const visible = useMemo(() => {
     const list = players ?? [];
     const filtered = list.filter((player) => {
-      const blob = `${player.name} ${player.area} ${player.id}`.toLowerCase();
+      const blob = `${player.name} ${player.id}`.toLowerCase();
       const matchesQuery = blob.includes(query.trim().toLowerCase());
       const matchesRole = role === "all" || player.role === role;
       return matchesQuery && matchesRole;
@@ -100,7 +100,7 @@ export function PlayerBoard({ limit, showFilters = true, showIntro = true }: Pro
       {showFilters ? (
         <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:px-6">
           <label className="grid flex-1 gap-1 text-sm font-medium">
-            Name or area
+            Name
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
@@ -146,7 +146,7 @@ export function PlayerBoard({ limit, showFilters = true, showIntro = true }: Pro
               <div>
                 <p className="text-lg font-semibold text-[#17241c]">{player.name}</p>
                 <p className="text-sm text-[#3e5146]">
-                  {player.age} years · {player.role} · {player.area}
+                  {player.age} years · {player.role}
                 </p>
                 <p className="text-sm text-[#3e5146]">
                   {player.batting} · Jersey {player.jersey} · mobile •••• {player.mobileTail}

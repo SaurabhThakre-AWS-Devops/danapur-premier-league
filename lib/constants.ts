@@ -31,25 +31,6 @@ export const BOWLING = [
 
 export const JERSEYS = ["S", "M", "L", "XL", "XXL", "XXXL"] as const;
 
-export const AREAS = [
-  "Danapur",
-  "Danapur Cantt",
-  "Khagaul",
-  "Digha",
-  "Bihta",
-  "Maner",
-  "Naubatpur",
-  "Neora",
-  "Shivala",
-  "Saguna More",
-  "RPS More",
-  "Anand Bazar",
-  "Gola Road",
-  "Bailey Road",
-  "Khajpura",
-  "Phulwari Sharif",
-];
-
 export function isRegistrationOpen(now = Date.now()) {
   return now <= new Date(DEADLINE_ISO).getTime();
 }

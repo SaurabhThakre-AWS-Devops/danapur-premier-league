@@ -479,7 +479,7 @@ export function AdminPanel() {
                 <p className="font-display text-lg text-[#1e4d34]">{player.id}</p>
                 <p className="text-xl font-semibold">{player.name}</p>
                 <p className="text-sm text-[#3e5146]">
-                  {formatMobile(player.mobile)} · {player.age} years · {player.area}
+                  {formatMobile(player.mobile)} · {player.age} years
                 </p>
                 <p className="text-sm text-[#3e5146]">
                   {player.role} · {player.batting} · {player.bowling} · Jersey {player.jersey}
@@ -534,10 +534,6 @@ export function AdminPanel() {
                   <Input value={draft.age} onChange={(event) => setDraft({ ...draft, age: event.target.value.replace(/\D/g, "").slice(0, 2) })} className={inputClass} required />
                 </Label>
               </div>
-              <Label className="grid gap-1">
-                Area
-                <Input value={draft.area} onChange={(event) => setDraft({ ...draft, area: event.target.value })} className={inputClass} required />
-              </Label>
               <div className="grid gap-3 sm:grid-cols-2">
                 <Label className="grid gap-1">
                   Role
