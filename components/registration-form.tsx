@@ -15,6 +15,7 @@ import {
   ROLES,
 } from "@/lib/constants";
 import { maskTail } from "@/lib/format";
+import { digest, emailRegistration, loadRoster, saveRoster, toPublic } from "@/lib/roster-client";
 import { normalizeMobile, normalizeUtr, registerSchema } from "@/lib/schema";
 import type { PublicPlayer } from "@/lib/types";
 import type { ZodError } from "zod";
@@ -81,11 +82,55 @@ export function RegistrationForm() {
       return;
     }
     setErrors({});
+    setSubmitting(true);
     if (process.env.NEXT_PUBLIC_STATIC_HOST === "true") {
-      setFormError("This GitHub page cannot save a player. Registration is stored on the server, not in the GitHub page.");
+      try {
+        const roster = await loadRoster();
+        const mobileHash = await digest(parsed.data.mobile);
+        const utrHash = await digest(parsed.data.utr);
+        if (roster.players.some((player) => player.mobileHash === mobileHash)) {
+          setErrors({ mobile: "This mobile number is already registered." });
+          return;
+        }
+        if (roster.players.some((player) => player.utrHash === utrHash)) {
+          setErrors({ utr: "This transaction ID is already used by another player." });
+          return;
+        }
+        const createdAt = new Date().toISOString();
+        const stored = {
+          id: `DPL-${String(roster.nextNumber).padStart(3, "0")}`,
+          name: parsed.data.name,
+          age: parsed.data.age,
+          area: parsed.data.area,
+          role: parsed.data.role,
+          batting: parsed.data.batting,
+          bowling: parsed.data.bowling,
+          jersey: parsed.data.jersey,
+          paymentStatus: "pending" as const,
+          mobileTail: parsed.data.mobile.slice(-4),
+          createdAt,
+          mobileHash,
+          utrHash,
+        };
+        const next = { nextNumber: roster.nextNumber + 1, players: [...roster.players, stored] };
+        await saveRoster(next);
+        const mail = await emailRegistration(
+          { ...stored, mobile: parsed.data.mobile, utr: parsed.data.utr },
+          next,
+        ).catch(() => ({ ok: false, message: "" }));
+        setDone({ player: toPublic(stored), emailSent: mail.ok });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Registration could not be saved.";
+        setFormError(
+          message.toLowerCase().includes("not verified")
+            ? "The list store is waiting for a confirmation email to gawairatan960@gmail.com. Open that mail, confirm it, then register again."
+            : message,
+        );
+      } finally {
+        setSubmitting(false);
+      }
       return;
     }
-    setSubmitting(true);
     try {
       const response = await fetch("/api/register", {
         method: "POST",
@@ -126,8 +171,10 @@ export function RegistrationForm() {
         <p className="mt-4 text-sm leading-6">
           Your name is on the public list so everyone can see it.{" "}
           {done.emailSent
-            ? "The full list was emailed to the organiser with the Excel file."
-            : "The full list is ready as Excel on the organiser's admin page."}
+            ? "The organiser email has the full mobile number and transaction ID."
+            : process.env.NEXT_PUBLIC_STATIC_HOST === "true"
+              ? "The organiser email is waiting for one confirmation link at gawairatan960@gmail.com. After that link is opened, the full mobile number and transaction ID will arrive by email."
+              : "The full list is ready as Excel on the organiser's admin page."}
         </p>
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
           <Link href="/players" className="inline-flex h-12 items-center justify-center rounded-lg bg-[#1e4d34] px-4 font-semibold text-[#f6f1e4]">

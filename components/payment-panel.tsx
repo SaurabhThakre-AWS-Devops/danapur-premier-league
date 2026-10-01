@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 import { buttonVariants } from "@/components/ui/button";
 import { FEE_RUPEES, PAYEE_NAME, UPI_ID, upiPayLink } from "@/lib/constants";
@@ -34,14 +33,11 @@ export function PaymentPanel({ open }: { open: boolean }) {
 
       {open ? (
         <>
-          <div className="relative mt-4 h-72 overflow-hidden rounded-2xl bg-black sm:h-80">
-            <Image
-              src="/phonepe-qr.jpg"
+          <div className="mt-4 overflow-hidden rounded-2xl bg-black">
+            <img
+              src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/phonepe-qr.jpg`}
               alt="PhonePe QR for Ratan Kailas Gawai, Danapur Premier League entry fee ₹100"
-              fill
-              priority
-              sizes="(min-width: 1024px) 420px, 100vw"
-              className="object-cover object-[center_38%]"
+              className="mx-auto max-h-[34rem] w-full object-contain"
             />
           </div>
           <a

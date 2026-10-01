@@ -17,7 +17,9 @@ npm run dev -- -p 43123 -H 0.0.0.0
 
 Open `/` to register, `/players` for the public list, and `/admin` for the organiser.
 
-The same screens are published on GitHub Pages: <https://saurabhthakre-aws-devops.github.io/danapur-premier-league/>. That page can show the form and the PhonePe QR. It cannot save players, send mail, or open the organiser list. Those stay on the machine that runs `npm run dev` or `npm start`.
+The public site is <https://saurabhthakre-aws-devops.github.io/danapur-premier-league/>.
+
+On that page, the shared list of names is stored at KVdb for the organiser email `gawairatan960@gmail.com`. The full mobile number and UPI transaction ID are not in that list. They are sent by email to the same address. The first save needs the organiser to open the confirmation mail from KVdb, and the first email needs the confirmation mail from FormSubmit. A name stays on the public list for 7 days after the last registration, then that free store drops it. The organiser inbox is the copy that remains.
 
 ## Mail
 

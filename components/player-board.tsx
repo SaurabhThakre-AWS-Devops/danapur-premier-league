@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { ROLES } from "@/lib/constants";
 import { formatWhen } from "@/lib/format";
+import { loadRoster, toPublic } from "@/lib/roster-client";
 import type { PublicPlayer, Role } from "@/lib/types";
 
 type Props = {
@@ -21,9 +22,24 @@ export function PlayerBoard({ limit, showFilters = true, showIntro = true }: Pro
 
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_STATIC_HOST === "true") {
-      setPlayers([]);
-      setError("The saved player list is on the registration server. This GitHub page does not keep names.");
-      return;
+      let cancelled = false;
+      const load = async () => {
+        try {
+          const roster = await loadRoster();
+          if (!cancelled) {
+            setPlayers(roster.players.map(toPublic));
+            setError("");
+          }
+        } catch {
+          if (!cancelled) setError("The public list could not be loaded.");
+        }
+      };
+      void load();
+      const id = setInterval(() => void load(), 15_000);
+      return () => {
+        cancelled = true;
+        clearInterval(id);
+      };
     }
     let cancelled = false;
     const load = async () => {
