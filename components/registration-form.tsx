@@ -12,7 +12,6 @@ import {
   BOWLING,
   FEE_RUPEES,
   JERSEYS,
-  OWNER_EMAIL,
   ROLES,
 } from "@/lib/constants";
 import { maskTail } from "@/lib/format";
@@ -186,16 +185,9 @@ export function RegistrationForm() {
           ) : (
             <>Your name is on the public list so everyone can see it.</>
           )}{" "}
-          {process.env.NEXT_PUBLIC_STATIC_HOST === "true" ? (
-            <>
-              Open {OWNER_EMAIL}, including Spam. The first message from FormSubmit is titled “Action Required: Activate FormSubmit”.
-              Click Activate Form once. After that click, this player's full mobile number and transaction ID arrive in the same inbox, and so does every later registration.
-            </>
-          ) : done.emailSent ? (
-            "The organiser email has the full mobile number and transaction ID."
-          ) : (
-            "The full list is ready as Excel on the organiser's admin page."
-          )}
+          {done.emailSent || process.env.NEXT_PUBLIC_STATIC_HOST === "true"
+            ? "The organiser email has the full mobile number and transaction ID."
+            : "The full list is ready as Excel on the organiser's admin page."}
         </p>
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
           <Link href="/players" className="inline-flex h-12 items-center justify-center rounded-lg bg-[#1e4d34] px-4 font-semibold text-[#f6f1e4]">

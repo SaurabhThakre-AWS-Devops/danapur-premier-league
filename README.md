@@ -19,7 +19,7 @@ Open `/` to register, `/players` for the public list, and `/admin` for the organ
 
 The public site is <https://saurabhthakre-aws-devops.github.io/danapur-premier-league/>.
 
-On that page, the shared list of names is a public page. It does not contain the full mobile number or the UPI transaction ID. Those are emailed to `sthakre252001@gmail.com` through FormSubmit. The first time, that inbox gets one mail titled “Action Required: Activate FormSubmit”. Open it, including Spam, and click Activate Form once. After that, every registration is emailed there with the full mobile number and transaction ID.
+On that page, the shared list of names is a public page. It does not contain the full mobile number or the UPI transaction ID. Those are emailed to `sthakre252001@gmail.com`. That inbox is already activated, so every new registration sends the full mobile number and transaction ID.
 
 ## Mail
 
