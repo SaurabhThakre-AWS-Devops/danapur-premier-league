@@ -6,7 +6,7 @@ import { listPlayers } from "@/lib/store";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  if (!(await isAdmin())) return json({ ok: false, error: "Login chahiye." }, 401);
+  if (!(await isAdmin())) return json({ ok: false, error: "Log in first." }, 401);
   const buffer = await buildWorkbook(await listPlayers());
   return new Response(new Uint8Array(buffer), {
     headers: {

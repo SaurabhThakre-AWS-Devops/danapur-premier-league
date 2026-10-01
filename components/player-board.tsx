@@ -29,7 +29,7 @@ export function PlayerBoard({ limit, showFilters = true }: Props) {
           setError("");
         }
       } catch {
-        if (!cancelled) setError("List load nahi ho payi.");
+        if (!cancelled) setError("The list could not be loaded.");
       }
     };
     void load();
@@ -58,9 +58,9 @@ export function PlayerBoard({ limit, showFilters = true }: Props) {
       <div className="flex flex-col gap-4 border-b border-[#1e4d34]/15 px-4 py-5 sm:flex-row sm:items-end sm:justify-between sm:px-6">
         <div>
           <p className="font-display text-xs tracking-[0.22em] text-[#8a6a2f]">PUBLIC LIST</p>
-          <h2 className="mt-1 font-hindi text-3xl leading-none text-[#17241c]">किसने फॉर्म भरा</h2>
+          <h2 className="mt-1 font-display text-3xl leading-none tracking-wide text-[#17241c]">Who has registered</h2>
           <p className="mt-2 max-w-xl text-sm text-[#3e5146]">
-            Jis ka naam yahan hai usne form bhar diya. Jo naam nahi dikh raha, uska form abhi baaki hai.
+            If a name is here, that player has registered. If it is not, the form is still pending.
           </p>
         </div>
         <p className="font-display text-4xl leading-none text-[#1e4d34] tabular-nums">
@@ -72,7 +72,7 @@ export function PlayerBoard({ limit, showFilters = true }: Props) {
       {showFilters ? (
         <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:px-6">
           <label className="grid flex-1 gap-1 text-sm font-medium">
-            Naam ya ilaka
+            Name or area
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
@@ -82,11 +82,11 @@ export function PlayerBoard({ limit, showFilters = true }: Props) {
           </label>
           <div className="flex flex-wrap items-end gap-2">
             <FilterChip active={role === "all"} onClick={() => setRole("all")}>
-              Sab
+              All
             </FilterChip>
             {ROLES.map((item) => (
               <FilterChip key={item.value} active={role === item.value} onClick={() => setRole(item.value)}>
-                {item.hi}
+                {item.value}
               </FilterChip>
             ))}
           </div>
@@ -97,7 +97,7 @@ export function PlayerBoard({ limit, showFilters = true }: Props) {
 
       {players && players.length === 0 ? (
         <p className="px-6 py-10 text-[#3e5146]">
-          Abhi tak koi player register nahi hua. Pehla naam aap likhwa sakte ho.
+          No players have registered yet. You can be the first name on the list.
         </p>
       ) : null}
 
@@ -109,16 +109,16 @@ export function PlayerBoard({ limit, showFilters = true }: Props) {
               <div>
                 <p className="text-lg font-semibold text-[#17241c]">{player.name}</p>
                 <p className="text-sm text-[#3e5146]">
-                  {player.age} saal · {roleLabel(player.role)} · {player.area}
+                  {player.age} years · {player.role} · {player.area}
                 </p>
                 <p className="text-sm text-[#3e5146]">
-                  {player.batting === "Right-hand" ? "दाएँ हाथ" : "बाएँ हाथ"} · Jersey {player.jersey} · mobile ••••{" "}
+                  {player.batting} · Jersey {player.jersey} · mobile ••••{" "}
                   {player.mobileTail}
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2 sm:justify-end">
                 <Badge variant={player.paymentStatus === "verified" ? "default" : "secondary"}>
-                  {player.paymentStatus === "verified" ? "Payment confirm" : "Fee bheja"}
+                  {player.paymentStatus === "verified" ? "Payment confirmed" : "Fee submitted"}
                 </Badge>
                 <span className="text-xs text-[#5c6b62]">{formatWhen(player.createdAt)}</span>
               </div>
@@ -128,22 +128,18 @@ export function PlayerBoard({ limit, showFilters = true }: Props) {
       ) : null}
 
       {players && visible.length === 0 && players.length > 0 ? (
-        <p className="px-6 py-8 text-sm text-[#3e5146]">Is search par koi naam nahi mila.</p>
+        <p className="px-6 py-8 text-sm text-[#3e5146]">No names match this search.</p>
       ) : null}
 
       {typeof limit === "number" && count > limit ? (
         <div className="border-t border-[#1e4d34]/10 px-6 py-4">
           <Link href="/players" className="font-semibold text-[#1e4d34] underline decoration-[#c4a15a] underline-offset-4">
-            Saare {count} naam dekho
+            See all {count} names
           </Link>
         </div>
       ) : null}
     </section>
   );
-}
-
-function roleLabel(role: Role) {
-  return ROLES.find((item) => item.value === role)?.hi ?? role;
 }
 
 function FilterChip({

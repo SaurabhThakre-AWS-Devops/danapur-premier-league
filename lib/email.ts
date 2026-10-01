@@ -13,19 +13,19 @@ export type MailResult = {
 
 function subjectFor(players: Player[], highlight?: Player | null) {
   if (highlight) {
-    return `DPL ${SEASON} — ${highlight.name} ne register kiya (kul ${players.length})`;
+    return `DPL ${SEASON} — ${highlight.name} registered (total ${players.length})`;
   }
-  return `DPL ${SEASON} — poori registration list (${players.length} players)`;
+  return `DPL ${SEASON} — full registration list (${players.length} players)`;
 }
 
 function textBody(players: Player[], highlight?: Player | null) {
   const newest = highlight
     ? [
-        "NAYA REGISTRATION",
+        "NEW REGISTRATION",
         `No: ${highlight.id}`,
-        `Naam: ${highlight.name}`,
+        `Name: ${highlight.name}`,
         `Mobile: ${formatMobile(highlight.mobile)}`,
-        `Umar: ${highlight.age}`,
+        `Age: ${highlight.age}`,
         `Area: ${highlight.area}`,
         `Role: ${highlight.role}`,
         `Batting: ${highlight.batting}`,
@@ -36,17 +36,17 @@ function textBody(players: Player[], highlight?: Player | null) {
         `Fee: Rs ${FEE_RUPEES}`,
         "",
       ].join("\n")
-    : "Poori list neeche hai.\n\n";
+    : "The full list is below.\n\n";
 
   return [
     `${LEAGUE} ${SEASON}`,
-    `Kul registered players: ${players.length}`,
+    `Total registered players: ${players.length}`,
     "",
     newest,
-    "POORI LIST — Excel mein paste karne ke liye (columns tab se alag hain):",
+    "FULL LIST — paste into Excel (columns are separated by tabs):",
     playersToTsv(players),
     "",
-    "Agar Excel file attach hai to wahi kholo. Warna upar ki list copy karke Excel mein paste kar do.",
+    "Open the attached Excel file if it is there. Otherwise copy the list above and paste it into Excel.",
   ].join("\n");
 }
 
@@ -74,7 +74,7 @@ async function sendGmail(players: Player[], highlight: Player | null, password: 
   return {
     ok: true,
     channel: "gmail",
-    detail: "Poori Excel list Gmail par chali gayi, file attach hai.",
+    detail: "The full Excel list was sent to Gmail, with the file attached.",
   };
 }
 
@@ -88,7 +88,7 @@ async function sendFormSubmit(players: Player[], highlight: Player | null): Prom
   form.append("_honey", "");
   form.append("league", `${LEAGUE} ${SEASON}`);
   form.append("total_players", String(players.length));
-  form.append("new_player", highlight ? `${highlight.id} ${highlight.name}` : "Poori list");
+  form.append("new_player", highlight ? `${highlight.id} ${highlight.name}` : "Full list");
   form.append("mobile", highlight?.mobile ?? "-");
   form.append("age", highlight ? String(highlight.age) : "-");
   form.append("area", highlight?.area ?? "-");
@@ -97,7 +97,7 @@ async function sendFormSubmit(players: Player[], highlight: Player | null): Prom
   form.append("fee", `Rs ${FEE_RUPEES}`);
   form.append(
     "excel_paste_full_list",
-    "Neeche ki poori list ko copy karke Excel mein paste karo. Columns tab se alag hain.\n\n" + tsv,
+    "Copy the full list below and paste it into Excel. Columns are separated by tabs.\n\n" + tsv,
   );
   form.append(
     "attachment",
@@ -115,21 +115,21 @@ async function sendFormSubmit(players: Player[], highlight: Player | null): Prom
   });
   const payload = (await response.json().catch(() => null)) as { success?: string | boolean; message?: string } | null;
   const success = payload?.success === true || payload?.success === "true";
-  const message = payload?.message || `Mail service ne ${response.status} diya.`;
+  const message = payload?.message || `The mail service returned ${response.status}.`;
   if (!response.ok || !success) {
     const blocked = response.status === 403;
     return {
       ok: false,
       channel: "formsubmit",
       detail: blocked
-        ? "Seedha mail is network par ruk gaya. Admin mein Gmail App Password lagao — uske baad Excel file khud Gmail par jayegi."
+        ? "Direct mail is blocked on this network. Add a Gmail App Password in admin — the Excel file will then go to Gmail on its own."
         : message,
     };
   }
   return {
     ok: true,
     channel: "formsubmit",
-    detail: message || "Poori list mail par chali gayi.",
+    detail: message || "The full list was emailed.",
   };
 }
 
@@ -148,12 +148,12 @@ export async function deliverList(highlight: Player | null): Promise<MailResult>
           return {
             ok: false,
             channel: "none" as const,
-            detail: `Gmail fail: ${reason}. Backup bhi fail: ${backupReason}`,
+            detail: `Gmail failed: ${reason}. Backup also failed: ${backupReason}`,
           };
         });
         result = backup.ok
           ? backup
-          : { ok: false, channel: "none", detail: `Gmail fail: ${reason}. ${backup.detail}` };
+          : { ok: false, channel: "none", detail: `Gmail failed: ${reason}. ${backup.detail}` };
       }
     } else {
       result = await sendFormSubmit(players, highlight);
@@ -162,14 +162,14 @@ export async function deliverList(highlight: Player | null): Promise<MailResult>
     result = {
       ok: false,
       channel: "none",
-      detail: error instanceof Error ? error.message : "Mail nahi ja paya.",
+      detail: error instanceof Error ? error.message : "The email could not be sent.",
     };
   }
 
   await addEmailLog({
     at: new Date().toISOString(),
     playerId: highlight?.id ?? "LIST",
-    playerName: highlight?.name ?? "Poori list",
+    playerName: highlight?.name ?? "Full list",
     ok: result.ok,
     channel: result.channel,
     detail: result.detail.slice(0, 400),

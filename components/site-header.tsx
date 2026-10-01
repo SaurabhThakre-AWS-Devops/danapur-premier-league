@@ -5,8 +5,8 @@ import { usePathname } from "next/navigation";
 import { cn } from "cn";
 
 const links = [
-  { href: "/", label: "रजिस्टर" },
-  { href: "/players", label: "कौन आया" },
+  { href: "/", label: "Register" },
+  { href: "/players", label: "Who's in" },
 ];
 
 export function SiteHeader() {
@@ -19,8 +19,8 @@ export function SiteHeader() {
             DPL
           </span>
           <span className="min-w-0">
-            <span className="block truncate font-hindi text-lg leading-none text-[#f6f1e4] sm:text-xl">
-              दानापुर प्रीमियर लीग
+            <span className="block truncate font-display text-lg leading-none tracking-wide text-[#f6f1e4] sm:text-xl">
+              Danapur Premier League
             </span>
             <span className="mt-1 block font-display text-[11px] tracking-[0.22em] text-[#c4a15a]">
               CRICKET 2026

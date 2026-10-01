@@ -18,12 +18,12 @@ export async function buildWorkbook(players: Player[]) {
     views: [{ state: "frozen", ySplit: 1 }],
   });
   sheet.columns = [
-    { header: "Kr.", key: "n", width: 6 },
+    { header: "No.", key: "n", width: 6 },
     { header: "Registration No.", key: "id", width: 18 },
-    { header: "Khilaadi ka naam", key: "name", width: 28 },
+    { header: "Player name", key: "name", width: 28 },
     { header: "Mobile", key: "mobile", width: 16 },
-    { header: "Umar", key: "age", width: 8 },
-    { header: "Mohalla / Area", key: "area", width: 22 },
+    { header: "Age", key: "age", width: 8 },
+    { header: "Area", key: "area", width: 22 },
     { header: "Role", key: "role", width: 16 },
     { header: "Batting", key: "batting", width: 14 },
     { header: "Bowling", key: "bowling", width: 22 },
@@ -75,7 +75,7 @@ export async function buildWorkbook(players: Player[]) {
   const pending = ordered.length - verified;
   const summary = workbook.addWorksheet("Summary");
   summary.columns = [
-    { header: "Cheez", key: "label", width: 36 },
+    { header: "Item", key: "label", width: 36 },
     { header: "Value", key: "value", width: 42 },
   ];
   const rows: Array<[string, string | number]> = [
@@ -89,7 +89,7 @@ export async function buildWorkbook(players: Player[]) {
     ["Payment pending", pending],
     ["Verified collection (Rs)", verified * FEE_RUPEES],
     ["Pending collection (Rs)", pending * FEE_RUPEES],
-    ["Excel banne ka time (IST)", formatWhen(new Date().toISOString())],
+    ["Excel created (IST)", formatWhen(new Date().toISOString())],
   ];
   rows.forEach(([label, value]) => summary.addRow({ label, value: excelSafe(value) }));
   summary.getRow(1).font = { bold: true, color: { argb: "FFF6F1E4" } };
@@ -102,7 +102,7 @@ export async function buildWorkbook(players: Player[]) {
 export function playersToTsv(players: Player[]) {
   const ordered = [...players].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
   const header = [
-    "Kr.",
+    "No.",
     "Registration No.",
     "Name",
     "Mobile",

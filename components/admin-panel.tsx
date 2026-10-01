@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { BATTING, BOWLING, BOWLING_HI, FEE_RUPEES, JERSEYS, OWNER_EMAIL, ROLES } from "@/lib/constants";
+import { BATTING, BOWLING, FEE_RUPEES, JERSEYS, OWNER_EMAIL, ROLES } from "@/lib/constants";
 import { formatMobile, formatWhen } from "@/lib/format";
 import { normalizeMobile, normalizeUtr } from "@/lib/schema";
 import type { EmailLogEntry, PaymentStatus, Player } from "@/lib/types";
@@ -100,7 +100,7 @@ export function AdminPanel() {
       });
       const data = (await response.json()) as { error?: string };
       if (!response.ok) {
-        setLoginError(data.error || "Login nahi hua.");
+        setLoginError(data.error || "Login failed.");
         return;
       }
       setPassword("");
@@ -119,7 +119,7 @@ export function AdminPanel() {
   async function downloadExcel() {
     const response = await fetch("/api/admin/export");
     if (!response.ok) {
-      setNotice("Excel nahi bani. Dobara login karke try karo.");
+      setNotice("Excel could not be built. Log in again and try.");
       return;
     }
     const blob = await response.blob();
@@ -137,7 +137,7 @@ export function AdminPanel() {
     try {
       const response = await fetch("/api/admin/resend", { method: "POST" });
       const data = (await response.json()) as { detail?: string; error?: string };
-      setNotice(data.detail || data.error || "Mail try ho gaya.");
+      setNotice(data.detail || data.error || "Email attempted.");
       await load();
     } finally {
       setBusy(false);
@@ -155,7 +155,7 @@ export function AdminPanel() {
         body: JSON.stringify({ appPassword }),
       });
       const data = (await response.json()) as { detail?: string; error?: string };
-      setNotice(data.detail || data.error || "Save ho gaya.");
+      setNotice(data.detail || data.error || "Saved.");
       if (response.ok) setAppPassword("");
       await load();
     } finally {
@@ -170,7 +170,7 @@ export function AdminPanel() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ clear: true }),
     });
-    setNotice("Gmail app password hata diya. Ab list FormSubmit se jayegi.");
+    setNotice("Gmail app password removed. The list will use the backup mail path.");
     await load();
     setBusy(false);
   }
@@ -183,7 +183,7 @@ export function AdminPanel() {
     });
     if (!response.ok) {
       const data = (await response.json()) as { error?: string };
-      setNotice(data.error || "Payment update nahi hua.");
+      setNotice(data.error || "Payment was not updated.");
       return;
     }
     await load();
@@ -218,7 +218,7 @@ export function AdminPanel() {
       });
       const data = (await response.json()) as { error?: string };
       if (!response.ok) {
-        setNotice(data.error || "Edit save nahi hua.");
+        setNotice(data.error || "The edit was not saved.");
         return;
       }
       setEditing(null);
@@ -234,14 +234,14 @@ export function AdminPanel() {
     setBusy(true);
     const response = await fetch(`/api/admin/players/${removing.id}`, { method: "DELETE" });
     const data = (await response.json()) as { error?: string };
-    if (!response.ok) setNotice(data.error || "Delete nahi hua.");
+    if (!response.ok) setNotice(data.error || "Delete failed.");
     setRemoving(null);
     await load();
     setBusy(false);
   }
 
   if (phase === "loading") {
-    return <p className="px-4 py-16 text-center text-[#f6f1e4]/70">Admin khul raha hai…</p>;
+    return <p className="px-4 py-16 text-center text-[#f6f1e4]/70">Opening admin…</p>;
   }
 
   if (phase === "login") {
@@ -249,9 +249,9 @@ export function AdminPanel() {
       <div className="mx-auto w-full max-w-md px-4 py-12">
         <form onSubmit={login} className="scorecard grid gap-4 rounded-3xl p-6">
           <p className="font-display text-xs tracking-[0.22em] text-[#8a6a2f]">ORGANISER</p>
-          <h1 className="font-hindi text-4xl text-[#17241c]">पूरा एक्सेस</h1>
+          <h1 className="font-display text-4xl tracking-wide text-[#17241c]">Full access</h1>
           <p className="text-sm leading-6 text-[#3e5146]">
-            Sirf {OWNER_EMAIL} is list ka owner hai. Yahan mobile, UTR aur Excel sab dikhega.
+            Only {OWNER_EMAIL} owns this list. Mobile numbers, transaction IDs, and Excel are all here.
           </p>
           <div className="grid gap-1.5">
             <Label htmlFor="admin-email">Email</Label>
@@ -263,7 +263,7 @@ export function AdminPanel() {
           </div>
           {loginError ? <p className="text-sm text-[#9b2330]">{loginError}</p> : null}
           <Button type="submit" className="h-12" disabled={busy}>
-            {busy ? "Check ho raha hai…" : "Login"}
+            {busy ? "Checking…" : "Log in"}
           </Button>
         </form>
       </div>
@@ -275,7 +275,7 @@ export function AdminPanel() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="font-display text-xs tracking-[0.22em] text-[#c4a15a]">FULL ACCESS · {OWNER_EMAIL}</p>
-          <h1 className="mt-2 font-hindi text-4xl text-[#f6f1e4] sm:text-5xl">सभी रजिस्ट्रेशन</h1>
+          <h1 className="mt-2 font-display text-4xl tracking-wide text-[#f6f1e4] sm:text-5xl">All registrations</h1>
         </div>
         <Button type="button" variant="outline" className="h-11 border-white/20 bg-transparent text-[#f6f1e4] hover:bg-white/10" onClick={() => void logout()}>
           Logout
@@ -286,15 +286,15 @@ export function AdminPanel() {
         <Stat label="Registered" value={String(players.length)} />
         <Stat label="Fee confirm" value={String(verified)} />
         <Stat label="Pending" value={String(pending)} />
-        <Stat label="Confirm hua" value={`₹${verified * FEE_RUPEES}`} />
+        <Stat label="Confirmed" value={`₹${verified * FEE_RUPEES}`} />
       </dl>
 
       <section className="scorecard mt-6 rounded-3xl p-4 sm:p-5">
-        <h2 className="font-hindi text-2xl">Excel mail</h2>
+        <h2 className="font-display text-2xl tracking-wide">Excel email</h2>
         <p className="mt-2 text-sm leading-6 text-[#3e5146]">
-          Poori list yahin Excel mein download hoti hai. Automatic mail ke liye neeche Gmail App Password lagao — Google Account, Security, 2-Step Verification, phir App passwords. Woh normal Gmail password nahi hota. Lagate hi har naye player par poori Excel file {OWNER_EMAIL} par khud chali jayegi.
+          Download the full list as Excel here. For automatic email, add a Gmail App Password below — Google Account, Security, 2-Step Verification, then App passwords. That is not the normal Gmail password. After it is saved, every new player sends the full Excel file to {OWNER_EMAIL}.
         </p>
-        <p className="mt-2 text-sm font-semibold">{gmailReady ? "Gmail Excel attach ke liye jud chuka hai." : "Abhi Excel attachment ke liye Gmail password nahi laga."}</p>
+        <p className="mt-2 text-sm font-semibold">{gmailReady ? "Gmail is connected for Excel attachments." : "No Gmail password is saved for Excel attachments yet."}</p>
         <form onSubmit={saveMail} className="mt-3 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
           <label className="grid gap-1 text-sm">
             Gmail App Password
@@ -303,24 +303,24 @@ export function AdminPanel() {
               autoComplete="new-password"
               value={appPassword}
               onChange={(event) => setAppPassword(event.target.value)}
-              placeholder="16 letters, spaces chalenge"
+              placeholder="16 letters, spaces are fine"
               className={inputClass}
             />
           </label>
           <Button type="submit" className="h-12" disabled={busy || appPassword.trim().length < 8}>
-            Save aur test mail
+            Save and send test
           </Button>
         </form>
         <div className="mt-3 flex flex-wrap gap-2">
           <Button type="button" variant="outline" className="h-10" onClick={() => void downloadExcel()}>
-            Excel download
+            Download Excel
           </Button>
           <Button type="button" variant="outline" className="h-10" disabled={busy} onClick={() => void resend()}>
-            Poori list abhi mail karo
+            Email the full list now
           </Button>
           {gmailReady ? (
             <Button type="button" variant="ghost" className="h-10" disabled={busy} onClick={() => void clearMail()}>
-              Gmail password hatao
+              Remove Gmail password
             </Button>
           ) : null}
         </div>
@@ -329,7 +329,7 @@ export function AdminPanel() {
           <ul className="mt-4 grid gap-2 text-sm">
             {log.map((entry) => (
               <li key={`${entry.at}-${entry.playerId}`} className="rounded-xl bg-[#fffdf8] px-3 py-2">
-                <span className={entry.ok ? "text-[#1e4d34]" : "text-[#9b2330]"}>{entry.ok ? "Gayi" : "Nahi gayi"}</span>
+                <span className={entry.ok ? "text-[#1e4d34]" : "text-[#9b2330]"}>{entry.ok ? "Sent" : "Not sent"}</span>
                 {" · "}
                 {entry.playerName} · {formatWhen(entry.at)}
                 <span className="block text-[#5c6b62]">{entry.detail}</span>
@@ -343,7 +343,7 @@ export function AdminPanel() {
         <Input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Naam, mobile, UTR ya DPL number"
+          placeholder="Name, mobile, UTR, or DPL number"
           className="h-12 border-white/15 bg-white/5 text-[#f6f1e4] placeholder:text-[#f6f1e4]/40"
         />
       </div>
@@ -356,14 +356,14 @@ export function AdminPanel() {
                 <p className="font-display text-lg text-[#1e4d34]">{player.id}</p>
                 <p className="text-xl font-semibold">{player.name}</p>
                 <p className="text-sm text-[#3e5146]">
-                  {formatMobile(player.mobile)} · {player.age} saal · {player.area}
+                  {formatMobile(player.mobile)} · {player.age} years · {player.area}
                 </p>
                 <p className="text-sm text-[#3e5146]">
                   {player.role} · {player.batting} · {player.bowling} · Jersey {player.jersey}
                 </p>
                 <p className="mt-1 font-mono text-sm">UTR {player.utr}</p>
                 <p className="text-xs text-[#5c6b62]">
-                  {formatWhen(player.createdAt)} · {player.paymentStatus === "verified" ? "Payment confirm" : "Fee check baaki"}
+                  {formatWhen(player.createdAt)} · {player.paymentStatus === "verified" ? "Payment confirmed" : "Fee still to check"}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -372,7 +372,7 @@ export function AdminPanel() {
                   className="h-10"
                   onClick={() => void setPayment(player, player.paymentStatus === "verified" ? "pending" : "verified")}
                 >
-                  {player.paymentStatus === "verified" ? "Pending karo" : "₹100 confirm"}
+                  {player.paymentStatus === "verified" ? "Mark pending" : "Confirm ₹100"}
                 </Button>
                 <Button type="button" variant="outline" className="h-10" onClick={() => openEdit(player)}>
                   Edit
@@ -385,18 +385,18 @@ export function AdminPanel() {
           </li>
         ))}
       </ul>
-      {filtered.length === 0 ? <p className="mt-6 text-[#f6f1e4]/70">Koi registration nahi mili.</p> : null}
+      {filtered.length === 0 ? <p className="mt-6 text-[#f6f1e4]/70">No registrations found.</p> : null}
 
       <Dialog open={Boolean(editing)} onOpenChange={(open) => !open && setEditing(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Player edit {editing?.id}</DialogTitle>
-            <DialogDescription>Galat naam ya UTR yahin theek karo.</DialogDescription>
+            <DialogTitle>Edit player {editing?.id}</DialogTitle>
+            <DialogDescription>Correct a wrong name or transaction ID here.</DialogDescription>
           </DialogHeader>
           {draft ? (
             <form id="edit-player" onSubmit={saveEdit} className="grid gap-3">
               <Label className="grid gap-1">
-                Naam
+                Name
                 <Input value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} className={inputClass} required />
               </Label>
               <div className="grid gap-3 sm:grid-cols-2">
@@ -405,12 +405,12 @@ export function AdminPanel() {
                   <Input value={draft.mobile} onChange={(event) => setDraft({ ...draft, mobile: normalizeMobile(event.target.value).slice(0, 10) })} className={inputClass} required />
                 </Label>
                 <Label className="grid gap-1">
-                  Umar
+                  Age
                   <Input value={draft.age} onChange={(event) => setDraft({ ...draft, age: event.target.value.replace(/\D/g, "").slice(0, 2) })} className={inputClass} required />
                 </Label>
               </div>
               <Label className="grid gap-1">
-                Ilaka
+                Area
                 <Input value={draft.area} onChange={(event) => setDraft({ ...draft, area: event.target.value })} className={inputClass} required />
               </Label>
               <div className="grid gap-3 sm:grid-cols-2">
@@ -419,7 +419,7 @@ export function AdminPanel() {
                   <select value={draft.role} onChange={(event) => setDraft({ ...draft, role: event.target.value })} className="h-12 rounded-lg border px-3">
                     {ROLES.map((item) => (
                       <option key={item.value} value={item.value}>
-                        {item.hi}
+                        {item.value}
                       </option>
                     ))}
                   </select>
@@ -429,7 +429,7 @@ export function AdminPanel() {
                   <select value={draft.batting} onChange={(event) => setDraft({ ...draft, batting: event.target.value })} className="h-12 rounded-lg border px-3">
                     {BATTING.map((item) => (
                       <option key={item.value} value={item.value}>
-                        {item.hi}
+                        {item.value}
                       </option>
                     ))}
                   </select>
@@ -441,7 +441,7 @@ export function AdminPanel() {
                   <select value={draft.bowling} onChange={(event) => setDraft({ ...draft, bowling: event.target.value })} className="h-12 rounded-lg border px-3">
                     {BOWLING.map((item) => (
                       <option key={item} value={item}>
-                        {BOWLING_HI[item]}
+                        {item}
                       </option>
                     ))}
                   </select>
@@ -476,12 +476,12 @@ export function AdminPanel() {
           <DialogHeader>
             <DialogTitle>Delete {removing?.name}?</DialogTitle>
             <DialogDescription>
-              {removing?.id} list aur agli Excel se hat jayega. Registration number dobara use nahi hoga.
+              {removing?.id} will leave the list and the next Excel file. That registration number will not be reused.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button type="button" variant="destructive" className="h-11" disabled={busy} onClick={() => void confirmDelete()}>
-              Haan, hatao
+              Yes, remove
             </Button>
           </DialogFooter>
         </DialogContent>

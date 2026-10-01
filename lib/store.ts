@@ -80,20 +80,20 @@ export async function listPlayers() {
 export async function addPlayer(input: Omit<Player, "id" | "createdAt" | "paymentStatus">) {
   return lock(async () => {
     if (!isRegistrationOpen()) {
-      throw new StoreError("CLOSED", "Registration band ho chuka hai. Aakhri tareekh 19 October 2026 thi.");
+      throw new StoreError("CLOSED", "Registration is closed. The last date was 19 October 2026.");
     }
     const db = await read();
     if (db.players.length >= MAX_PLAYERS) {
-      throw new StoreError("FULL", "Is league ki registration list full hai.");
+      throw new StoreError("FULL", "This league's registration list is full.");
     }
     if (db.players.some((player) => player.mobile === input.mobile)) {
       throw new StoreError(
         "DUPLICATE_MOBILE",
-        "Yeh mobile number pehle se registered hai. Public list mein naam dekho.",
+        "This mobile number is already registered.",
       );
     }
     if (db.players.some((player) => player.utr === input.utr)) {
-      throw new StoreError("DUPLICATE_UTR", "Yeh transaction ID pehle kisi aur player ke naam par lagi hai.");
+      throw new StoreError("DUPLICATE_UTR", "This transaction ID is already used by another player.");
     }
     const player: Player = {
       ...input,
@@ -112,17 +112,17 @@ export async function updatePlayer(id: string, patch: Partial<Omit<Player, "id" 
   return lock(async () => {
     const db = await read();
     const index = db.players.findIndex((player) => player.id === id);
-    if (index < 0) throw new StoreError("NOT_FOUND", "Player nahi mila.");
+    if (index < 0) throw new StoreError("NOT_FOUND", "Player not found.");
     const current = db.players[index];
     const clean = Object.fromEntries(
       Object.entries(patch).filter(([, value]) => value !== undefined),
     ) as Partial<Player>;
     const next = { ...current, ...clean, id: current.id, createdAt: current.createdAt };
     if (db.players.some((player) => player.id !== id && player.mobile === next.mobile)) {
-      throw new StoreError("DUPLICATE_MOBILE", "Yeh mobile number kisi aur player par hai.");
+      throw new StoreError("DUPLICATE_MOBILE", "This mobile number belongs to another player.");
     }
     if (db.players.some((player) => player.id !== id && player.utr === next.utr)) {
-      throw new StoreError("DUPLICATE_UTR", "Yeh transaction ID kisi aur player par hai.");
+      throw new StoreError("DUPLICATE_UTR", "This transaction ID belongs to another player.");
     }
     db.players[index] = next;
     await write(db);
@@ -135,7 +135,7 @@ export async function deletePlayer(id: string) {
     const db = await read();
     const before = db.players.length;
     db.players = db.players.filter((player) => player.id !== id);
-    if (db.players.length === before) throw new StoreError("NOT_FOUND", "Player nahi mila.");
+    if (db.players.length === before) throw new StoreError("NOT_FOUND", "Player not found.");
     await write(db);
     return db.players;
   });

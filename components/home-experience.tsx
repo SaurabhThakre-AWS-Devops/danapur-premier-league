@@ -3,22 +3,24 @@ import { Countdown } from "@/components/countdown";
 import { PaymentPanel } from "@/components/payment-panel";
 import { PlayerBoard } from "@/components/player-board";
 import { RegistrationForm } from "@/components/registration-form";
-import { DEADLINE_LABEL, DEADLINE_LABEL_HI, FEE_RUPEES } from "@/lib/constants";
+import { DEADLINE_LABEL, FEE_RUPEES } from "@/lib/constants";
 
 export function HomeExperience({ open }: { open: boolean }) {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:py-12">
       <section className="max-w-3xl">
         <p className="font-display text-sm tracking-[0.28em] text-[#c4a15a]">DANAPUR · CRICKET · 2026</p>
-        <h1 className="mt-3 font-hindi text-5xl leading-[1.05] text-[#f6f1e4] sm:text-7xl">दानापुर प्रीमियर लीग</h1>
+        <h1 className="mt-3 font-display text-5xl leading-[0.95] tracking-wide text-[#f6f1e4] sm:text-7xl">
+          Danapur Premier League
+        </h1>
         <p className="mt-4 max-w-2xl text-lg leading-8 text-[#f6f1e4]/85">
-          Cricket player registration. Entry fee ₹{FEE_RUPEES}. आखिरी तारीख {DEADLINE_LABEL_HI}, raat 11:59 baje tak.
-          Jo form bharega uska naam sabko dikhega.
+          Cricket player registration. Entry fee ₹{FEE_RUPEES}. Last date {DEADLINE_LABEL}, 11:59 PM. Everyone who
+          registers shows up on the public list.
         </p>
         <dl className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
           <Fact label="Entry" value={`₹${FEE_RUPEES}`} />
           <Fact label="Last date" value={DEADLINE_LABEL} />
-          <Fact label={open ? "Time left" : "Status"} value={open ? <Countdown /> : "बंद"} />
+          <Fact label={open ? "Time left" : "Status"} value={open ? <Countdown /> : "Closed"} />
         </dl>
       </section>
 
@@ -29,9 +31,10 @@ export function HomeExperience({ open }: { open: boolean }) {
           ) : (
             <section className="scorecard rounded-3xl p-6">
               <p className="font-display text-xs tracking-[0.22em] text-[#8a6a2f]">REGISTRATION CLOSED</p>
-              <h2 className="mt-2 font-hindi text-4xl">रजिस्ट्रेशन बंद</h2>
+              <h2 className="mt-2 font-display text-4xl tracking-wide">Registration closed</h2>
               <p className="mt-3 text-[#3e5146]">
-                Aakhri tareekh {DEADLINE_LABEL_HI} thi. Naya form nahi bhara ja sakta. Jo bhar chuke hain unki list neeche hai.
+                The last date was {DEADLINE_LABEL}. New forms cannot be submitted. Players who already registered are
+                listed below.
               </p>
             </section>
           )}
@@ -42,9 +45,13 @@ export function HomeExperience({ open }: { open: boolean }) {
       </div>
 
       <ul className="mt-6 grid gap-2 text-sm text-[#f6f1e4]/75 sm:grid-cols-3">
-        <li className="rounded-2xl border border-white/10 px-4 py-3">Ek mobile number se ek hi player.</li>
-        <li className="rounded-2xl border border-white/10 px-4 py-3">Poora mobile sirf organiser ke mail aur admin mein.</li>
-        <li className="rounded-2xl border border-white/10 px-4 py-3">Galat UTR ho to admin payment confirm nahi karega.</li>
+        <li className="rounded-2xl border border-white/10 px-4 py-3">One player per mobile number.</li>
+        <li className="rounded-2xl border border-white/10 px-4 py-3">
+          The full mobile number is only in the organiser email and admin.
+        </li>
+        <li className="rounded-2xl border border-white/10 px-4 py-3">
+          A wrong transaction ID will not be marked as paid.
+        </li>
       </ul>
 
       <div className="mt-10">

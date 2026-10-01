@@ -10,7 +10,6 @@ import {
   AREAS,
   BATTING,
   BOWLING,
-  BOWLING_HI,
   FEE_RUPEES,
   JERSEYS,
   ROLES,
@@ -41,7 +40,7 @@ export function RegistrationForm() {
   const [area, setArea] = useState("");
   const [role, setRole] = useState("");
   const [batting, setBatting] = useState("");
-  const [bowling, setBowling] = useState("Nahi karta");
+  const [bowling, setBowling] = useState("Does not bowl");
   const [jersey, setJersey] = useState("");
   const [utr, setUtr] = useState("");
   const [paid, setPaid] = useState(false);
@@ -97,13 +96,13 @@ export function RegistrationForm() {
         emailSent?: boolean;
       };
       if (!response.ok || !data.ok || !data.player) {
-        if (data.field) setErrors({ [data.field]: data.error || "Check karo." });
-        setFormError(data.error || "Registration nahi ho payi.");
+        if (data.field) setErrors({ [data.field]: data.error || "Check this field." });
+        setFormError(data.error || "Registration failed.");
         return;
       }
       setDone({ player: data.player, emailSent: Boolean(data.emailSent) });
     } catch {
-      setFormError("Network ruk gaya. Dobara try karo.");
+      setFormError("The network stopped. Try again.");
     } finally {
       setSubmitting(false);
     }
@@ -113,22 +112,22 @@ export function RegistrationForm() {
     return (
       <section className="scorecard rounded-3xl p-5 sm:p-7">
         <p className="font-display text-xs tracking-[0.22em] text-[#8a6a2f]">REGISTRATION CONFIRMED</p>
-        <h2 className="mt-2 font-hindi text-4xl text-[#17241c]">नाम लिख गया</h2>
+        <h2 className="mt-2 font-display text-4xl tracking-wide text-[#17241c]">You're registered</h2>
         <p className="mt-3 font-display text-5xl tracking-wide text-[#1e4d34]">{done.player.id}</p>
         <p className="mt-2 text-2xl font-semibold">{done.player.name}</p>
         <p className="mt-1 text-[#3e5146]">
-          {done.player.age} saal · {done.player.area} · {done.player.role} · Jersey {done.player.jersey}
+          {done.player.age} years · {done.player.area} · {done.player.role} · Jersey {done.player.jersey}
         </p>
         <p className="mt-1 text-sm text-[#3e5146]">UTR {maskTail(utr)}</p>
         <p className="mt-4 text-sm leading-6">
-          Aapka naam public list mein aa gaya hai, taaki sab dekh saken.{" "}
+          Your name is on the public list so everyone can see it.{" "}
           {done.emailSent
-            ? "Poori list organiser ke Gmail par Excel ke saath chali gayi."
-            : "Poori list organiser ke admin page par Excel mein ready hai."}
+            ? "The full list was emailed to the organiser with the Excel file."
+            : "The full list is ready as Excel on the organiser's admin page."}
         </p>
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
           <Link href="/players" className="inline-flex h-12 items-center justify-center rounded-lg bg-[#1e4d34] px-4 font-semibold text-[#f6f1e4]">
-            Saari list dekho
+            See the full list
           </Link>
           <Button
             type="button"
@@ -147,7 +146,7 @@ export function RegistrationForm() {
               setPaid(false);
             }}
           >
-            Ek aur player
+            Register another player
           </Button>
         </div>
       </section>
@@ -157,9 +156,9 @@ export function RegistrationForm() {
   return (
     <section className="scorecard rounded-3xl p-5 sm:p-7">
       <p className="font-display text-xs tracking-[0.22em] text-[#8a6a2f]">01 · PLAYER FORM</p>
-      <h2 className="mt-1 font-hindi text-3xl text-[#17241c]">रजिस्ट्रेशन</h2>
+      <h2 className="mt-1 font-display text-3xl tracking-wide text-[#17241c]">Registration</h2>
       <p className="mt-2 text-sm text-[#3e5146]">
-        Mobile aur umar zaroori hain. Ek mobile se ek hi player. Entry ₹{FEE_RUPEES}.
+        Mobile and age are required. One player per mobile number. Entry ₹{FEE_RUPEES}.
       </p>
       <form onSubmit={onSubmit} className="mt-5 grid gap-4" noValidate>
         <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
@@ -168,11 +167,11 @@ export function RegistrationForm() {
             <input value={company} onChange={(event) => setCompany(event.target.value)} tabIndex={-1} autoComplete="off" />
           </label>
         </div>
-        <Field id="name" label="खिलाड़ी का नाम" hint="Player name" error={errors.name}>
+        <Field id="name" label="Player name" hint="As it should appear on the list" error={errors.name}>
           <Input id="name" value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" className={inputClass} aria-invalid={Boolean(errors.name)} required />
         </Field>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field id="mobile" label="मोबाइल नंबर" hint="10 digit, +91 ki zaroorat nahi" error={errors.mobile}>
+          <Field id="mobile" label="Mobile number" hint="10 digits, no +91" error={errors.mobile}>
             <Input
               id="mobile"
               inputMode="numeric"
@@ -185,7 +184,7 @@ export function RegistrationForm() {
               required
             />
           </Field>
-          <Field id="age" label="उम्र" hint="Saal mein, 12 se 60" error={errors.age}>
+          <Field id="age" label="Age" hint="Years, 12 to 60" error={errors.age}>
             <Input
               id="age"
               inputMode="numeric"
@@ -198,7 +197,7 @@ export function RegistrationForm() {
             />
           </Field>
         </div>
-        <Field id="area" label="मोहल्ला / इलाका" hint="Danapur, Khagaul, Digha..." error={errors.area}>
+        <Field id="area" label="Area" hint="Danapur, Khagaul, Digha..." error={errors.area}>
           <Input id="area" list="dpl-areas" value={area} onChange={(event) => setArea(event.target.value)} className={inputClass} aria-invalid={Boolean(errors.area)} required />
           <datalist id="dpl-areas">
             {AREAS.map((item) => (
@@ -207,40 +206,40 @@ export function RegistrationForm() {
           </datalist>
         </Field>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field id="role" label="क्या खेलते हो" hint="Playing role" error={errors.role}>
+          <Field id="role" label="Playing role" hint="How you play" error={errors.role}>
             <Select id="role" value={role} onChange={setRole} invalid={Boolean(errors.role)}>
-              <option value="">चुनो</option>
+              <option value="">Choose</option>
               {ROLES.map((item) => (
                 <option key={item.value} value={item.value}>
-                  {item.hi} · {item.value}
+                  {item.value}
                 </option>
               ))}
             </Select>
           </Field>
-          <Field id="batting" label="बल्लेबाज़ी" hint="Batting hand" error={errors.batting}>
+          <Field id="batting" label="Batting" hint="Batting hand" error={errors.batting}>
             <Select id="batting" value={batting} onChange={setBatting} invalid={Boolean(errors.batting)}>
-              <option value="">चुनो</option>
+              <option value="">Choose</option>
               {BATTING.map((item) => (
                 <option key={item.value} value={item.value}>
-                  {item.hi}
+                  {item.value}
                 </option>
               ))}
             </Select>
           </Field>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field id="bowling" label="गेंदबाज़ी" hint="Agar nahi daalte to wahi rehne do" error={errors.bowling}>
+          <Field id="bowling" label="Bowling" hint="Leave as is if you do not bowl" error={errors.bowling}>
             <Select id="bowling" value={bowling} onChange={setBowling} invalid={Boolean(errors.bowling)}>
               {BOWLING.map((item) => (
                 <option key={item} value={item}>
-                  {BOWLING_HI[item]}
+                  {item}
                 </option>
               ))}
             </Select>
           </Field>
-          <Field id="jersey" label="जर्सी साइज़" hint="T-shirt size" error={errors.jersey}>
+          <Field id="jersey" label="Jersey size" hint="T-shirt size" error={errors.jersey}>
             <Select id="jersey" value={jersey} onChange={setJersey} invalid={Boolean(errors.jersey)}>
-              <option value="">चुनो</option>
+              <option value="">Choose</option>
               {JERSEYS.map((item) => (
                 <option key={item} value={item}>
                   {item}
@@ -249,7 +248,7 @@ export function RegistrationForm() {
             </Select>
           </Field>
         </div>
-        <Field id="utr" label="UPI transaction ID" hint="₹100 bhejne ke baad PhonePe history se UTR" error={errors.utr}>
+        <Field id="utr" label="UPI transaction ID" hint="From PhonePe history after you pay ₹100" error={errors.utr}>
           <Input
             id="utr"
             value={utr}
@@ -269,7 +268,7 @@ export function RegistrationForm() {
             className="mt-1 size-5"
           />
           <button id="paid-label" type="button" className="text-left text-sm leading-6" onClick={() => setPaid((value) => !value)}>
-            Maine PhonePe se ₹{FEE_RUPEES} bhej diya hai, aur upar wali transaction ID meri hai.
+            I have paid ₹{FEE_RUPEES} on PhonePe, and the transaction ID above is mine.
           </button>
         </div>
         {errors.paid ? <p className="text-sm text-[#9b2330]">{errors.paid}</p> : null}
@@ -279,7 +278,7 @@ export function RegistrationForm() {
           </p>
         ) : null}
         <Button type="submit" disabled={submitting} className="h-12 text-base">
-          {submitting ? "Save ho raha hai…" : `रजिस्टर करो · ₹${FEE_RUPEES}`}
+          {submitting ? "Saving…" : `Register · ₹${FEE_RUPEES}`}
         </Button>
       </form>
     </section>

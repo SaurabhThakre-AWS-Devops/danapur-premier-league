@@ -8,7 +8,7 @@ export function SiteFooter() {
         <div>
           <p className="font-display text-base tracking-[0.16em] text-[#f6f1e4]">DANAPUR PREMIER LEAGUE 2026</p>
           <p className="mt-1">
-            Entry ₹{FEE_RUPEES} · आखिरी तारीख {DEADLINE_LABEL}
+            Entry ₹{FEE_RUPEES} · Last date {DEADLINE_LABEL}
           </p>
           <p className="mt-1">
             Organiser {PAYEE_NAME} ·{" "}

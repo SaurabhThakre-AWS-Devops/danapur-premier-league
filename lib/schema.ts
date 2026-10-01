@@ -32,47 +32,47 @@ export const registerSchema = z.object({
     .pipe(
       z
         .string()
-        .min(2, "Naam kam se kam 2 akshar ka hona chahiye.")
-        .max(60, "Naam bahut lamba hai.")
-        .regex(/^[\p{L}\p{M}][\p{L}\p{M}\s.'-]{1,59}$/u, "Naam mein sirf akshar likho."),
+        .min(2, "Name must be at least 2 letters.")
+        .max(60, "Name is too long.")
+        .regex(/^[\p{L}\p{M}][\p{L}\p{M}\s.'-]{1,59}$/u, "Use letters in the name."),
     ),
   mobile: z
     .string()
     .transform(normalizeMobile)
-    .pipe(z.string().regex(/^[6-9]\d{9}$/, "Mobile 10 digit ka hona chahiye, aur 6, 7, 8 ya 9 se shuru.")),
+    .pipe(z.string().regex(/^[6-9]\d{9}$/, "Mobile must be 10 digits and start with 6, 7, 8, or 9.")),
   age: z.coerce
-    .number({ invalid_type_error: "Umar number mein likho." })
-    .int("Umar poora number hona chahiye.")
-    .min(12, "Umar 12 se 60 saal ke beech honi chahiye.")
-    .max(60, "Umar 12 se 60 saal ke beech honi chahiye."),
+    .number({ invalid_type_error: "Enter age as a number." })
+    .int("Age must be a whole number.")
+    .min(12, "Age must be between 12 and 60.")
+    .max(60, "Age must be between 12 and 60."),
   area: z
     .string()
     .transform(normalizeName)
     .pipe(
       z
         .string()
-        .min(2, "Mohalla ya ilaka likho.")
-        .max(80, "Ilaka bahut lamba hai."),
+        .min(2, "Enter your area.")
+        .max(80, "Area is too long."),
     ),
-  role: z.enum(roleValues, { errorMap: () => ({ message: "Khelne ki bhumika chuno." }) }),
-  batting: z.enum(battingValues, { errorMap: () => ({ message: "Batting haath chuno." }) }),
+  role: z.enum(roleValues, { errorMap: () => ({ message: "Choose a playing role." }) }),
+  batting: z.enum(battingValues, { errorMap: () => ({ message: "Choose a batting hand." }) }),
   bowling: z
     .string()
     .optional()
-    .transform((value) => (value && value.trim() ? value.trim() : "Nahi karta"))
-    .pipe(z.enum(BOWLING, { errorMap: () => ({ message: "Bowling style list se chuno." }) })),
-  jersey: z.enum(JERSEYS, { errorMap: () => ({ message: "Jersey size chuno." }) }),
+    .transform((value) => (value && value.trim() ? value.trim() : "Does not bowl"))
+    .pipe(z.enum(BOWLING, { errorMap: () => ({ message: "Choose a bowling style from the list." }) })),
+  jersey: z.enum(JERSEYS, { errorMap: () => ({ message: "Choose a jersey size." }) }),
   utr: z
     .string()
     .transform(normalizeUtr)
     .pipe(
       z
         .string()
-        .min(8, "Transaction ID kam se kam 8 character ki honi chahiye.")
-        .max(22, "Transaction ID bahut lambi hai."),
+        .min(8, "Enter the transaction ID after you pay ₹100.")
+        .max(22, "Transaction ID is too long."),
     ),
   paid: z.literal(true, {
-    errorMap: () => ({ message: "₹100 bhejne ke baad checkbox par nishaan lagao." }),
+    errorMap: () => ({ message: "Tick the box after you pay ₹100." }),
   }),
   company: z.string().optional(),
 });
@@ -84,6 +84,6 @@ export function fieldError(error: z.ZodError) {
   const field = first?.path[0];
   return {
     field: typeof field === "string" ? field : undefined,
-    error: first?.message || "Form check karo.",
+    error: first?.message || "Check the form.",
   };
 }
