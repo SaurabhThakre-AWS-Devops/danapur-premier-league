@@ -19,8 +19,8 @@ Open `/` to register, `/players` for the public list, and `/admin` for the organ
 
 ## Mail
 
-- Without extra setup, each registration is emailed through FormSubmit. The first mail asks `gawairatan960@gmail.com` to activate the form. After that, every mail contains the full player list (tab-separated, so it pastes into Excel) and an Excel attachment when the mail service keeps it.
-- For a reliable Excel attachment from Gmail itself, log in at `/admin` and save a Gmail App Password (Google Account → Security → 2-Step Verification → App passwords). That is not the normal Gmail password.
+- The organiser downloads the full Excel from `/admin` at any time.
+- To also email that Excel automatically on every registration, log in at `/admin` and save a Gmail App Password (Google Account → Security → 2-Step Verification → App passwords). That is not the normal Gmail password. Quote `ADMIN_PASSWORD` in `.env.local` if it contains `#`.
 
 ## What is stored
 

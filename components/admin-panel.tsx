@@ -292,7 +292,7 @@ export function AdminPanel() {
       <section className="scorecard mt-6 rounded-3xl p-4 sm:p-5">
         <h2 className="font-hindi text-2xl">Excel mail</h2>
         <p className="mt-2 text-sm leading-6 text-[#3e5146]">
-          Jaise hi koi register karega, poori list {OWNER_EMAIL} par jayegi. Gmail App Password lagao to Excel file attach hoke aayegi. Bina uske bhi list mail ke andar aati hai — pehli baar Gmail mein FormSubmit ka Activate link aa sakta hai, use confirm kar dena.
+          Poori list yahin Excel mein download hoti hai. Automatic mail ke liye neeche Gmail App Password lagao — Google Account, Security, 2-Step Verification, phir App passwords. Woh normal Gmail password nahi hota. Lagate hi har naye player par poori Excel file {OWNER_EMAIL} par khud chali jayegi.
         </p>
         <p className="mt-2 text-sm font-semibold">{gmailReady ? "Gmail Excel attach ke liye jud chuka hai." : "Abhi Excel attachment ke liye Gmail password nahi laga."}</p>
         <form onSubmit={saveMail} className="mt-3 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">

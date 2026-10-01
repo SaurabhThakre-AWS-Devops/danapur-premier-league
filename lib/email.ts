@@ -117,10 +117,13 @@ async function sendFormSubmit(players: Player[], highlight: Player | null): Prom
   const success = payload?.success === true || payload?.success === "true";
   const message = payload?.message || `Mail service ne ${response.status} diya.`;
   if (!response.ok || !success) {
+    const blocked = response.status === 403;
     return {
       ok: false,
       channel: "formsubmit",
-      detail: message,
+      detail: blocked
+        ? "Seedha mail is network par ruk gaya. Admin mein Gmail App Password lagao — uske baad Excel file khud Gmail par jayegi."
+        : message,
     };
   }
   return {

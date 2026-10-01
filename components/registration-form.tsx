@@ -123,8 +123,8 @@ export function RegistrationForm() {
         <p className="mt-4 text-sm leading-6">
           Aapka naam public list mein aa gaya hai, taaki sab dekh saken.{" "}
           {done.emailSent
-            ? "Poori list organiser ke mail par bhi chali gayi."
-            : "Naam save hai. Mail thodi der mein ja sakta hai."}
+            ? "Poori list organiser ke Gmail par Excel ke saath chali gayi."
+            : "Poori list organiser ke admin page par Excel mein ready hai."}
         </p>
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
           <Link href="/players" className="inline-flex h-12 items-center justify-center rounded-lg bg-[#1e4d34] px-4 font-semibold text-[#f6f1e4]">
