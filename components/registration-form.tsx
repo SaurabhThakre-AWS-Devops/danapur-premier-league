@@ -81,6 +81,10 @@ export function RegistrationForm() {
       return;
     }
     setErrors({});
+    if (process.env.NEXT_PUBLIC_STATIC_HOST === "true") {
+      setFormError("This GitHub page cannot save a player. Registration is stored on the server, not in the GitHub page.");
+      return;
+    }
     setSubmitting(true);
     try {
       const response = await fetch("/api/register", {

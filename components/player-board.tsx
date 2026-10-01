@@ -20,6 +20,11 @@ export function PlayerBoard({ limit, showFilters = true, showIntro = true }: Pro
   const [role, setRole] = useState<Role | "all">("all");
 
   useEffect(() => {
+    if (process.env.NEXT_PUBLIC_STATIC_HOST === "true") {
+      setPlayers([]);
+      setError("The saved player list is on the registration server. This GitHub page does not keep names.");
+      return;
+    }
     let cancelled = false;
     const load = async () => {
       try {

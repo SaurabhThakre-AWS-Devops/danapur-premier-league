@@ -36,6 +36,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`${noto.variable} ${condensed.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <SiteHeader />
+        {process.env.NEXT_PUBLIC_STATIC_HOST === "true" ? (
+          <p className="bg-[#c4a15a] px-4 py-2 text-center text-sm font-semibold text-[#17241c]">
+            This GitHub page shows the form and the PhonePe QR. Player names are saved only on the registration server.
+          </p>
+        ) : null}
         <main className="flex-1">{children}</main>
         <SiteFooter />
       </body>

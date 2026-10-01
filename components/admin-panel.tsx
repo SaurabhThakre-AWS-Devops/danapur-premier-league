@@ -66,6 +66,11 @@ export function AdminPanel() {
   }
 
   useEffect(() => {
+    if (process.env.NEXT_PUBLIC_STATIC_HOST === "true") {
+      setPhase("login");
+      setLoginError("Organiser login runs on the registration server. This GitHub page cannot open the full list.");
+      return;
+    }
     void (async () => {
       const response = await fetch("/api/admin/session", { cache: "no-store" });
       const data = (await response.json()) as { ok: boolean };

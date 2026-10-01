@@ -17,6 +17,8 @@ npm run dev -- -p 43123 -H 0.0.0.0
 
 Open `/` to register, `/players` for the public list, and `/admin` for the organiser.
 
+The same screens are published on GitHub Pages: <https://saurabhthakre-aws-devops.github.io/danapur-premier-league/>. That page can show the form and the PhonePe QR. It cannot save players, send mail, or open the organiser list. Those stay on the machine that runs `npm run dev` or `npm start`.
+
 ## Mail
 
 - The organiser downloads the full Excel from `/admin` at any time.
